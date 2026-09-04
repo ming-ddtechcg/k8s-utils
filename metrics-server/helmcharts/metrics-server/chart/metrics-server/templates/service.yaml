@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.metrics_server.name }}
+  name: {{ .Values.metrics_server.name }}
+  namespace: {{ .Values.env.namespace }}
+spec:
+  ports:
+  - name: https
+    port: {{ .Values.metrics_server.service.port }}
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: {{ .Values.metrics_server.name }}
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: "1.0"
+description: A Helm chart for Kubernetes metrics server
+home: https://github.com/ming-ddtechcg/k8s-utils
+name: metrics-server
+version: 0.0.1
+

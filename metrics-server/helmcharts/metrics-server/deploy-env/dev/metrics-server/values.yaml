@@ -1,0 +1,50 @@
+
+#
+# Kubernetes metrics server
+#
+env:
+  namespace: kube-system
+
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note: 
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key: infra
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+metrics_server:
+  name: metrics-server
+  container:
+    image: harbor.ddtechcg.com/k8s-utils/metrics-server:v0.6.2
+    port: 4443
+    args: 
+      - "metric-resolution=15s"
+      - "kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+      - "kubelet-insecure-tls"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 200Mi
+  service:
+    port: 443
+
+  aggregated_metrics_reader:
+    name: aggregated-metrics-reader
+
+  api_service:
+    name: v1beta1.metrics.k8s.io
+    version: v1beta1
+    version_priority: 100
+    group_name: metrics.k8s.io
+    group_priority_minimum: 100
+    insecure_skip_tls_verify: true
+

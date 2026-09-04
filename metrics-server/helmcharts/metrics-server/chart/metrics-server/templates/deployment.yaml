@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.metrics_server.name }}
+  name: {{ .Values.metrics_server.name }}
+  namespace: {{ .Values.env.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.metrics_server.name }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.metrics_server.name }}
+    spec:
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist 
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.metrics_server.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.metrics_server.name }}
+      containers:
+      - args:
+        - --cert-dir=/tmp
+        - --secure-port={{ .Values.metrics_server.container.port }}
+        - --kubelet-use-node-status-port
+      {{- range .Values.metrics_server.container.args }}
+        - --{{ . }}
+      {{- end }}
+        image: {{ .Values.metrics_server.container.image }}
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /livez
+            port: https
+            scheme: HTTPS
+          periodSeconds: 10
+        name: {{ .Values.metrics_server.name }}
+        ports:
+        - containerPort: {{ .Values.metrics_server.container.port }}
+          name: https
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /readyz
+            port: https
+            scheme: HTTPS
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: {{ .Values.metrics_server.container.resources.requests.cpu }}
+            memory: {{ .Values.metrics_server.container.resources.requests.memory }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-dir
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-cluster-critical
+      serviceAccountName: {{ .Values.metrics_server.name }}
+      volumes:
+      - emptyDir: {}
+        name: tmp-dir
+

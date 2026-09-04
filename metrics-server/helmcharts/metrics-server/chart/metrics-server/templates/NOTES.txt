@@ -1,0 +1,10 @@
+
+Release chart versions:
+
+0.0.1
+========
+- the first version metrics-server.
+
+End of the release note.
+========
+

@@ -1,0 +1,16 @@
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  labels:
+    app: {{ .Values.metrics_server.name }}
+  name: {{ .Values.metrics_server.api_service.name }}
+spec:
+  group: {{ .Values.metrics_server.api_service.group_name }}
+  groupPriorityMinimum: {{ .Values.metrics_server.api_service.group_priority_minimum }}
+  insecureSkipTLSVerify: {{ .Values.metrics_server.api_service.insecure_skip_tls_verify }}
+  service:
+    name: {{ .Values.metrics_server.name }}
+    namespace: {{ .Values.env.namespace }}
+  version: {{ .Values.metrics_server.api_service.version }}
+  versionPriority: {{ .Values.metrics_server.api_service.version_priority }}
+
