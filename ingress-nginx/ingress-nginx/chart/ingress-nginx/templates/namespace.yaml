@@ -1,0 +1,9 @@
+{{- if .Values.service.namespace_definition.creation_enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/instance: {{ .Values.controller.name }}
+    app.kubernetes.io/name: {{ .Values.controller.name }}
+  name: {{ .Values.service.namespace_definition.namespace }}
+{{- end }}
