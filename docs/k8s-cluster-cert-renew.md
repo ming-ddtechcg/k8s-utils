@@ -9,7 +9,7 @@ Login one of master/control-plane nodes and execute the following command:
 sudo kubeadm certs check-expiration
 ```
 
-# renew all cerificates
+# Renew all cerificates
 
 On one of master/control-plane nodes and execute the following command to renew all certifcates:
 
@@ -33,7 +33,32 @@ do
         continue
     fi
 
-    kill -9 ${each_process}
+    sudo kill -9 ${each_process}
 done
+```
+
+# Updates for all node Kubelet
+To enable kubelet to roate the certificate for two methods:
+
+## method 1
+ensure the following lines in /var/lib/kubelet/config.yaml:
+
+```yaml
+rotateCertificates: true
+serverTLSBootstrap: true
+```
+
+## method 2
+update /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf for Environment="KUBELET_KUBECONFIG_ARGS=...", likes
+
+```bash
+--rotate-server-certificates=true --bootstrap-kubeconfig=/var/lib/kubelet/bootstrap-kubeconfig --kubeconfig=/var/lib/kubelet/kubeconfig
+```
+
+then perform:
+
+```bash
+systemctl daemon-reload
+systemctl restart kubelet
 ```
 
