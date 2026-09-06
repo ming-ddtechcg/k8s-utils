@@ -98,3 +98,16 @@ do
 done
 ```
 
+output:
+
+```
+certificatesigningrequest.certificates.k8s.io/csr-hbbhh approved
+certificatesigningrequest.certificates.k8s.io/csr-kdl2p approved
+certificatesigningrequest.certificates.k8s.io/csr-m49gj approved
+```
+
+# References
+
+- [Certificate Management with kubeadm](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
+- [TLS bootstrapping](https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#certificate-rotation)
+
