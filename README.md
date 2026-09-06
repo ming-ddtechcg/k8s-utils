@@ -1,2 +1,2 @@
 # k8s-utils
-Kubernetes utilities
+Kubernetes utilities and documents
