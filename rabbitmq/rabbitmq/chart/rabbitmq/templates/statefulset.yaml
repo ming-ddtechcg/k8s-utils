@@ -63,19 +63,18 @@ spec:
         command:
         - sh
         - -c
-        - "cp /tmp/config/rabbitmq.conf /config/rabbitmq.conf && ls -l /config/ && cp /tmp/config/enabled_plugins /etc/rabbitmq/enabled_plugins"
+        - "cp /tmp/config/rabbitmq.conf /etc/rabbitmq/rabbitmq.conf && cp /tmp/config/enabled_plugins /etc/rabbitmq/enabled_plugins && ls -l /etc/rabbitmq"
         resources:
           limits:
             cpu: {{ .Values.rabbitmq_init.resources.limits.cpu }}
             memory: {{ .Values.rabbitmq_init.resources.limits.memory }}
         volumeMounts:
         - name: config
-          mountPath: /tmp/config/
+          mountPath: /etc/rabbitmq
           readOnly: false
-        - name: config-file
-          mountPath: /config/
-        - name: plugins-file
-          mountPath: /etc/rabbitmq/
+        - name: config-files
+          mountPath: /tmp/config/
+          readOnly: true
       containers:
       - name: {{ .Values.rabbitmq.name }}
         image: {{ .Values.rabbitmq.container.image }}
@@ -99,7 +98,7 @@ spec:
         - name: RABBITMQ_USE_LONGNAME 
           value: "true"
         - name: RABBITMQ_CONFIG_FILE
-          value: "/config/rabbitmq"
+          value: "/etc/rabbitmq/rabbitmq.conf"
         - name: RABBITMQ_ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
@@ -118,18 +117,12 @@ spec:
         - name: data
           mountPath: /var/lib/rabbitmq
           readOnly: false
-        - name: config-file
-          mountPath: /config/
-        - name: plugins-file
-          mountPath: /etc/rabbitmq/
       serviceAccount: {{ .Values.rabbitmq.name }}
       serviceAccountName: {{ .Values.rabbitmq.name }}
       volumes:
-      - name: config-file
-        emptyDir: {}
-      - name: plugins-file
-        emptyDir: {}
       - name: config
+        emptyDir: {}
+      - name: config-files
         configMap:
           name: {{ .Values.rabbitmq.name }}-config
           defaultMode: 0755

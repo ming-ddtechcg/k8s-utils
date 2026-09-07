@@ -22,7 +22,7 @@ service:
 
 rabbitmq:
   name: rabbitmq
-  replicas: "4"
+  replicas: "3"
   container:
     image: harbor.ddtechcg.com/library/rabbitmq:3.8-management
   ports:
