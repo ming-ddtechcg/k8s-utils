@@ -70,7 +70,7 @@ spec:
             memory: {{ .Values.rabbitmq_init.resources.limits.memory }}
         volumeMounts:
         - name: config
-          mountPath: /etc/rabbitmq
+          mountPath: /etc/rabbitmq/
           readOnly: false
         - name: config-files
           mountPath: /tmp/config/
@@ -97,8 +97,8 @@ spec:
           value: rabbit@$(RABBIT_POD_NAME).rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
         - name: RABBITMQ_USE_LONGNAME 
           value: "true"
-        - name: RABBITMQ_CONFIG_FILE
-          value: "/etc/rabbitmq/rabbitmq.conf"
+        #- name: RABBITMQ_CONFIG_FILE
+        #  value: "/etc/rabbitmq/rabbitmq.conf"
         - name: RABBITMQ_ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
@@ -116,6 +116,9 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/rabbitmq
+          readOnly: false
+        - name: config
+          mountPath: /etc/rabbitmq/
           readOnly: false
       serviceAccount: {{ .Values.rabbitmq.name }}
       serviceAccountName: {{ .Values.rabbitmq.name }}
