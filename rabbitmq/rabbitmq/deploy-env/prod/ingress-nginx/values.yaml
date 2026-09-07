@@ -1,0 +1,41 @@
+#
+# Ingress nginx
+#
+
+service:
+  name: nginx
+  components:
+    controller: controller
+    admission_webhook: admission-webhook
+  version: 1.11.2
+  namespace_definition:
+    namespace: ingress-nginx
+    creation_enabled: true
+  control_plane_deployment: false
+
+controller:
+  name: ingress-nginx
+  image: harbor.ddtechcg.com/k8s-utils/ingress-nginx-controller:v1.11.2 
+  ports:
+    http_port_name: http
+    http_port: "80"
+    https_port_name: https
+    https_port: "443"
+    webhook_port_name: webhook
+    webhook_port: "8443"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+
+admission:
+  name: ingress-nginx-admission
+
+admission_create:
+  name: ingress-nginx-admission-create
+  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
+
+admission_patch:
+  name: ingress-nginx-admission-patch
+  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
+

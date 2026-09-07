@@ -1,0 +1,46 @@
+#
+# RabbitMQ
+#
+env:
+  namespace: kube-system
+
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+rabbitmq:
+  name: rabbitmq
+  replicas: "4"
+  container:
+    image: harbor.ddtechcg.com/library/rabbitmq:3.8-management
+  ports:
+    discovery: "4369"
+    amqp: "5672"
+  storage:
+    storageclass: nfs-client-retain
+    accessmodes:
+    - ReadWriteOnce
+    size: 50Mi
+  config:
+    #
+    # RabbitMQ Erlang cookie
+    #
+    rabbitmq_erlang_cookie: WIWVHCDTCIUAWANLMQAW
+
+rabbitmq_init:
+  name: rabbitmq-init
+  container:
+    image: harbor.ddtechcg.com/library/busybox:1.38.0
+
