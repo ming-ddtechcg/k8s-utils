@@ -30,6 +30,7 @@ spec:
       containers:
       - args:
         - /nginx-ingress-controller
+        - --default-backend-service=$(POD_NAMESPACE)/{{ .Values.default_http_backend.name }}
         - --election-id=ingress-nginx-leader
         - --controller-class=k8s.io/{{ .Values.controller.name }}
         - --ingress-class=nginx

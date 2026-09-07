@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.default_http_backend.name }}
+  name: {{ .Values.default_http_backend.name }}
+  namespace: {{ .Values.service.namespace_definition.namespace }}
+spec:
+  replicas: {{ .Values.default_http_backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.default_http_backend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.default_http_backend.name }}
+    spec:
+      containers:
+      - name: {{ .Values.default_http_backend.name }}
+        # Official Kubernetes default backend image
+        image: {{ .Values.default_http_backend.image }}
+        ports:
+        - containerPort: {{ .Values.default_http_backend.ports.target_port }}
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.default_http_backend.resources.limits.cpu }}
+            memory: {{ .Values.default_http_backend.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.default_http_backend.resources.limits.cpu }}
+            memory: {{ .Values.default_http_backend.resources.limits.memory }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.default_http_backend.ports.target_port }}
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
