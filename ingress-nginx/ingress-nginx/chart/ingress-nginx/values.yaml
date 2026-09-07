@@ -1,5 +1,5 @@
 #
-# SRA-AIM Ingress nginx
+# Ingress nginx
 #
 
 service:
@@ -15,7 +15,7 @@ service:
 
 controller:
   name: ingress-nginx
-  image: docker-xcelerator-ai.dyndns.org:5001/sra-aim/ingress-nginx-controller:v1.11.2 
+  image: harbor.ddtechcg.com/k8s-utils/ingress-nginx-controller:v1.11.2 
   ports:
     http_port_name: http
     http_port: "80"
@@ -33,9 +33,24 @@ admission:
 
 admission_create:
   name: ingress-nginx-admission-create
-  image: docker-xcelerator-ai.dyndns.org:5001/sra-aim/kube-webhook-certgen:v1.4.3
+  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
 
 admission_patch:
   name: ingress-nginx-admission-patch
-  image: docker-xcelerator-ai.dyndns.org:5001/sra-aim/kube-webhook-certgen:v1.4.3
+  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
+
+default_http_backend:
+  name: default-http-backend
+  replicas: "1"
+  image: harbor.ddtechcg.com/k8s-utils/defaultbackend-amd64:1.5
+  ports:
+    port: 80
+    target_port: 8080 
+  resources:
+    limits:
+      cpu: 10m
+      memory: 20Mi
+    requests:
+      cpu: 10m
+      memory: 20Mi
 
