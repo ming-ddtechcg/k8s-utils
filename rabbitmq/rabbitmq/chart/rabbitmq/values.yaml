@@ -28,6 +28,7 @@ rabbitmq:
   ports:
     discovery: "4369"
     amqp: "5672"
+    management: "15672"
   resources:
     limits:
       cpu: 450m

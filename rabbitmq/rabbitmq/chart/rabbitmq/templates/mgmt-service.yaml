@@ -3,13 +3,12 @@ kind: Service
 metadata:
   labels:
     app: {{ .Values.rabbitmq.name }}
-  name: {{ .Values.rabbitmq.name }}
+  name: {{ .Values.rabbitmq.name }}-mgmt
   namespace: {{ .Release.Namespace }}
 spec:
-  clusterIP: None
   ports:
   {{- range $key, $value := .Values.rabbitmq.ports }}
-    {{- if ne $key "management" }}
+    {{- if eq $key "management" }}
   - name: {{ $key }}
     port: {{ $value }}
     targetPort: {{ $value }}
