@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   serviceName: {{ .Values.rabbitmq.name }}
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.rabbitmq.replicas }}
   selector:
     matchLabels:
       app: {{ .Values.rabbitmq.name }}
@@ -64,6 +64,10 @@ spec:
         - sh
         - -c
         - "cp /tmp/config/rabbitmq.conf /config/rabbitmq.conf && ls -l /config/ && cp /tmp/config/enabled_plugins /etc/rabbitmq/enabled_plugins"
+        resources:
+          limits:
+            cpu: {{ .Values.rabbitmq_init.resources.limits.cpu }}
+            memory: {{ .Values.rabbitmq_init.resources.limits.memory }}
         volumeMounts:
         - name: config
           mountPath: /tmp/config/
@@ -103,6 +107,13 @@ spec:
               key: RABBITMQ_ERLANG_COOKIE
         - name: K8S_HOSTNAME_SUFFIX
           value: .rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
+        resources:
+          limits:
+            cpu: {{ .Values.rabbitmq.resources.limits.cpu }}
+            memory: {{ .Values.rabbitmq.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.rabbitmq.resources.requests.cpu }}
+            memory: {{ .Values.rabbitmq.resources.requests.memory }} 
         volumeMounts:
         - name: data
           mountPath: /var/lib/rabbitmq

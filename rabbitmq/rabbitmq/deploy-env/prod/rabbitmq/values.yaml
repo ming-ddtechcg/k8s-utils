@@ -28,6 +28,13 @@ rabbitmq:
   ports:
     discovery: "4369"
     amqp: "5672"
+  resources:
+    limits:
+      cpu: 250m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 40Mi
   storage:
     storageclass: nfs-client-retain
     accessmodes:
@@ -43,4 +50,8 @@ rabbitmq_init:
   name: rabbitmq-init
   container:
     image: harbor.ddtechcg.com/library/busybox:1.38.0
+  resources:
+    limits:
+      cpu: 50m
+      memory: 100Mi
 
