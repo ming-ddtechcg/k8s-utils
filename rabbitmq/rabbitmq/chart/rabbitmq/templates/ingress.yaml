@@ -1,0 +1,35 @@
+{{- if .Values.rabbitmq_mgmt.ingress }}
+{{- if eq .Values.rabbitmq_mgmt.ingress "enabled" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route-cookie"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+#{{- if .Values.rabbitmq_mgmt.uri }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+#{{- end }}
+  name: {{ .Values.rabbitmq.name }}-mgmt
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.rabbitmq_mgmt.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.rabbitmq.name }}-mgmt
+            port:
+              number: 15672
+{{- if .Values.rabbitmq_mgmt.uri }}
+        path: /{{ .Values.rabbitmq_mgmt.uri }}(/|$)(.*)
+{{- else }}
+        path: /
+{{- end }}
+        pathType: ImplementationSpecific
+{{- end }}
+{{- end }}

@@ -56,3 +56,21 @@ rabbitmq_init:
       cpu: 50m
       memory: 100Mi
 
+rabbitmq_mgmt:
+  #
+  # RabbitMQ management ingress
+  #
+  # value: enabled|disable
+  # 
+  ingress: enabled
+  hostname: ariel.ddtechcg.com
+  #
+  # set URI
+  #
+  # NOTE:
+  # 1. if uri is set, the URI rewrite will be enabled, otherwise leave empty
+  #    for example:
+  #    uri: rabbitmq-mgmt
+  uri:
+
+    
