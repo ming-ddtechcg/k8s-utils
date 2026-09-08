@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fetch-cluster-info-pod
+  labels:
+    app: fetch-cluster-info-pod
+  namespace: fetch-cluster-info
+spec:
+  containers:
+  - name: fetch-cluster-info-pod
+    image: harbor.ddtechcg.com/playground/fetch-cluster-info:2
+    imagePullPolicy: Always
+    command:
+    - sh
+    - -c
+    - "while true; do sleep 1d; done"
+    env:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: RUNNING_NODENAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: RUNNING_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+  restartPolicy: Never
+  serviceAccount: fetch-cluster-info-pod
+  serviceAccountName: fetch-cluster-info-pod
+

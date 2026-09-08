@@ -1,0 +1,67 @@
+Project Plan - retrieve cluster information (v2 - as built)
+=============================================================
+
+This is an updated version of claude_plan_v1.txt, revised to reflect the
+final implementation. See also PROJECT_PLAN.md in the project root for the
+full write-up.
+
+The application is named "fetch-cluster-info".
+
+Purpose
+-------
+To access the configMap (kubeadm-config) in the namespace "kube-system"
+[corrected from "kue-system" in v1] for the following information under
+the section "networking" of data.ClusterConfiguration:
+  dnsDomain
+  podSubnet
+  serviceSubnet
+
+Parameters
+----------
+The application takes three parameters for:
+"--dns-domain" shows the value of "dnsDomain".
+"--pod-subnet" shows the value of "podSubnet".
+"--service-subnet" shows the value of "serviceSubnet".
+
+If none of the three flags are given, all three values are shown by default.
+Output is printed as "key=value", one per line.
+
+Runtime Environment
+--------------------
+The application can run either outside or inside of the Kubernetes cluster.
+
+For the inside cluster:
+1. the binary is compiled with CGO_ENABLED=0, making it compatible with
+   both Ubuntu/glibc and Alpine/musl container images without changes.
+2. the pod has a ClusterRole and ClusterRoleBinding granting (get, list)
+   access to the configmap "kubeadm-config" in the namespace "kube-system"
+   only (scoped via resourceNames, not cluster-wide configmap access).
+3. ca.crt and token information are read from
+   /run/secrets/kubernetes.io/serviceaccount via rest.InClusterConfig().
+
+For the outside cluster:
+1. based on the environment variable "KUBECONFIG" to access the kubernetes
+   cluster configuration file via clientcmd.BuildConfigFromFlags.
+
+Build
+-----
+A Makefile provides:
+  - prepare: go mod tidy
+  - build:   CGO_ENABLED=0 GOOS=linux go build -o bin/fetch-cluster-info .
+  - clean:   rm -rf bin/
+
+Container & Deployment (added in v2)
+-------------------------------------
+- docker/Dockerfile builds the image FROM
+  harbor.ddtechcg.com/playground/alpine-kubectl:1.36.4, copying in the
+  compiled binary.
+- docker/build.sh <tag> copies the binary from ../bin, builds, and tags
+  the image as harbor.ddtechcg.com/playground/fetch-cluster-info:<tag>.
+- k8s-resources/ contains the namespace, ServiceAccount, ClusterRole,
+  ClusterRoleBinding, and a long-running debug Pod definition needed to
+  run the tool inside a cluster (applied in file order 00 -> 07).
+
+Status
+------
+Implementation complete; builds successfully with the pinned module
+versions in go.mod/go.sum.

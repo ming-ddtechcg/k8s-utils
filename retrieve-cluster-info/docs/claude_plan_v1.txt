@@ -1,0 +1,40 @@
+Project Plan - retrieve cluster information
+===========================================
+
+The application will be named "fetch-cluster-info".
+
+Purpose
+-------
+To access the configMap (kubeadm-config) in the namespace "kue-system" for the following information under the section "networking" of data.ClusterConfiguration:
+  dnsDomain
+  podSubnet
+  serviceSubnet
+
+Parameters
+----------
+The application takes three parameters for:
+"--dns-domain" shows the value of "dnsDomain".
+"--pod-subnet" shows the value of "podSubnet".
+"--service-subnet" show the value of "serviceSubnet".
+
+Runtime Environment
+-------------------
+The application can run in either outside or inside of the Kubernetes cluster.
+
+For the inside cluster:
+1. the binary code is compaible with the Ubuntu and Apline container images.
+2. the pod will have the ClusterRole and ClusterRoleBinding permission to access (list,get) the configmap "kubeadm-config" in the namespace "kube-system".
+3. ca.crt and token information under /run/secrets/kubernetes.io/serviceaccount.
+
+For the outside cluster:
+1. based on the environment variable "KUBECONFIG" to access the kubernetes cluster configuration file.
+
+Build
+------
+1. Produce a Makefile file for:
+   - prepare the environment 
+   - compile the sourece code
+   - clean up the binary code
+
+
+
