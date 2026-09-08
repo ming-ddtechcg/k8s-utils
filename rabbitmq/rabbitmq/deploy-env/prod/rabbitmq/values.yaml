@@ -46,6 +46,10 @@ rabbitmq:
     # RabbitMQ Erlang cookie
     #
     rabbitmq_erlang_cookie: WIWVHCDTCIUAWANLMQAW
+    #
+    # The Kubernetes domain name
+    #
+    cluster_domain: cluster.local
 
 rabbitmq_init:
   name: rabbitmq-init

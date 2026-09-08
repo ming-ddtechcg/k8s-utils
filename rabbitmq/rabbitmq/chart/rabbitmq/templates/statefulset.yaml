@@ -94,7 +94,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: RABBITMQ_NODENAME
-          value: rabbit@$(RABBIT_POD_NAME).rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
+          value: rabbit@$(RABBIT_POD_NAME).rabbitmq.$(RABBIT_POD_NAMESPACE).svc.{{ .Values.rabbitmq.config.cluster_domain }}
         - name: RABBITMQ_USE_LONGNAME 
           value: "true"
         #- name: RABBITMQ_CONFIG_FILE
@@ -105,7 +105,7 @@ spec:
               name: {{ .Values.rabbitmq.name }}-secret
               key: RABBITMQ_ERLANG_COOKIE
         - name: K8S_HOSTNAME_SUFFIX
-          value: .rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
+          value: .rabbitmq.$(RABBIT_POD_NAMESPACE).svc.{{ .Values.rabbitmq.config.cluster_domain }}
         resources:
           limits:
             cpu: {{ .Values.rabbitmq.resources.limits.cpu }}
