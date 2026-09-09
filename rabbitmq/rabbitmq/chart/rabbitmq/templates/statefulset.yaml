@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: {{ .Values.rabbitmq.name }}
+      annotations:
+        checksum/init-script-cm: {{ include (print $.Template.BasePath "/script-init-configmap.yaml") . | sha256sum }}
     spec:
 {{- if .Values.service.nodeAffinity }}
       affinity:
@@ -63,7 +65,14 @@ spec:
         command:
         - sh
         - -c
-        - "cp /tmp/config/rabbitmq.conf /etc/rabbitmq/rabbitmq.conf && cp /tmp/config/enabled_plugins /etc/rabbitmq/enabled_plugins && ls -l /etc/rabbitmq"
+        - "cp /tmp/config/rabbitmq.conf /etc/rabbitmq/rabbitmq.conf; cp /tmp/config/enabled_plugins /etc/rabbitmq/enabled_plugins;  ls -l /etc/rabbitmq; mkdir /tmp/init-scripts; cp /tmp/scripts/* /tmp/init-scripts; chmod +x /tmp/init-scripts/*; /tmp/init-scripts/rabbitmq-config-proc.sh"
+        env:
+        - name: CLUSTER_DOMAIN
+          value: {{ .Values.rabbitmq.config.cluster_domain }}
+        - name: RABBITMQ_AMQP_PORT
+          value: "{{ .Values.rabbitmq.ports.amqp }}"
+        - name: RABBITMQ_CONSOLE_LOG
+          value: "{{ .Values.rabbitmq.config.rabbitmq_console_log }}"
         resources:
           limits:
             cpu: {{ .Values.rabbitmq_init.resources.limits.cpu }}
@@ -74,6 +83,9 @@ spec:
           readOnly: false
         - name: config-files
           mountPath: /tmp/config/
+          readOnly: true
+        - name: init-scripts
+          mountPath: /tmp/scripts/
           readOnly: true
       containers:
       - name: {{ .Values.rabbitmq.name }}
@@ -128,6 +140,10 @@ spec:
       - name: config-files
         configMap:
           name: {{ .Values.rabbitmq.name }}-config
+          defaultMode: 0755
+      - name: init-scripts
+        configMap:
+          name: {{ .Values.rabbitmq_init.name }}-script
           defaultMode: 0755
   volumeClaimTemplates:
   - metadata:

@@ -1,8 +1,6 @@
 #
 # RabbitMQ
 #
-env:
-  namespace: kube-system
 
 service:
   nodeAffinity:
@@ -50,6 +48,12 @@ rabbitmq:
     # The Kubernetes domain name
     #
     cluster_domain: cluster.local
+    #
+    # show the console logs
+    #
+    # value: "true"|"false"
+    #
+    rabbitmq_console_log: "true"
 
 rabbitmq_init:
   name: rabbitmq-init
@@ -77,4 +81,3 @@ rabbitmq_mgmt:
   #    uri: rabbitmq-mgmt
   uri:
 
-    

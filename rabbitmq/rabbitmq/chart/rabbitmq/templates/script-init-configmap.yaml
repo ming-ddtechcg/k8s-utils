@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.rabbitmq_init.name }}-script
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "scripts/init/*").AsConfig | indent 2  }}
