@@ -67,7 +67,7 @@ rabbitmq_mgmt:
   # value: enabled|disable
   # 
   ingress: enabled
-  hostname: ariel.ddtechcg.com
+  hostname: ariel-rabbitmq-mgmt.ddtechcg.com
   #
   # set URI
   #
