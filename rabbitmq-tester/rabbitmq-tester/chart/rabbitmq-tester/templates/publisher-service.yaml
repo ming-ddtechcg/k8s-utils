@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.tester.publisher.name }}
+  name: {{ .Values.tester.publisher.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  {{- range $key, $value := .Values.tester.publisher.ports }}
+  - name: {{ $key }}
+    port: {{ $value }}
+    targetPort: {{ $value }}
+  {{- end }}
+  selector:
+    app: {{ .Values.tester.publisher.name }}
+

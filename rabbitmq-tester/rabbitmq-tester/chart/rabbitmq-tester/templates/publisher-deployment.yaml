@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.tester.publisher.name }}
+  labels:
+    app: {{ .Values.tester.publisher.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.tester.publisher.name }}
+  replicas: {{ .Values.tester.publisher.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.tester.publisher.name }}
+    spec:
+      containers:
+      - name: {{ .Values.tester.publisher.name }}
+        image: {{ .Values.tester.publisher.container.image }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{ .Values.tester.publisher.ports.web }}
+        env:
+        - name: RABBIT_HOST 
+          value: {{ .Values.config.rabbitmq_host }}
+        - name: RABBIT_PORT
+          value: "{{ .Values.config.rabbitmq_port }}"
+        - name: RABBIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-tester-secret
+              key: RABBIT_USERNAME
+        - name: RABBIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-tester-secret
+              key: RABBIT_PASSWORD
+

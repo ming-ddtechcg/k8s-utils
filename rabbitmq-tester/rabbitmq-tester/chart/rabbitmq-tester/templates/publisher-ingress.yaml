@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route-cookie"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+#{{- if .Values.config.rabbitmq_publisher_uri }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+#{{- end }}
+  name: {{ .Values.tester.publisher.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.config.rabbitmq_publisher_host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.tester.publisher.name }}
+            port:
+              number: {{ .Values.tester.publisher.ports.web }}
+{{- if .Values.config.rabbitmq_publisher_uri }}
+        path: /{{ .Values.config.rabbitmq_publisher_uri }}(/|$)(.*)
+{{- else }}
+        path: /
+{{- end }}
+        pathType: ImplementationSpecific
+

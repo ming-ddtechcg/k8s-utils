@@ -1,0 +1,59 @@
+#
+# RabbitMQ tester
+#
+
+tester:
+  consumer:
+    name: rabbitmq-consumer
+    replicas: "1"
+    container:
+      image: harbor.ddtechcg.com/playground/rabbitmq-consumer:1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 150Mi
+      requests:
+        cpu: 100m
+        memory: 50Mi
+  publisher:
+    name: rabbitmq-publisher
+    replicas: "1"
+    container:
+      image: harbor.ddtechcg.com/playground/rabbitmq-publisher:1
+    ports:
+      web: "80"
+    resources:
+      limits:
+        cpu: 250m
+        memory: 150Mi
+      requests:
+        cpu: 100m
+        memory: 50Mi
+
+
+config:
+  #
+  # RabbitMQ host
+  #
+  rabbitmq_host: rabbitmq.rabbitmq.svc.cluster.local
+  #
+  # RabbitMQ AMQP port
+  #
+  rabbitmq_port: "5672"
+  #
+  # RabbitMQ user
+  #
+  rabbitmq_user: guest
+  #
+  # RabbitMQ password
+  #
+  rabbitmq_password: guest
+  #
+  # RabbitMQ publisher host
+  #
+  rabbitmq_publisher_host: ariel-rabbitmq-tester.ddtechcg.com
+  #
+  # RabbitMQ publisher URI
+  #
+  rabbitmq_publisher_uri:
+
