@@ -2,10 +2,12 @@ Project Plan - EKS Managed Node Group
 =====================================
 
 1. build the Makefile to execute:
-   - "terraform init" (if not init yet), 
-   - "terraform plan" (if first time build, or any tf files changed), 
-   - "terraform apply" (if no error from "terraform plan"). 
-2. make the Makefile can do the cleanup for:
-   - the directory ".terraform",
-   - the files ".terraform.lock.hcl", "terraform.tfstate", and "terraform.tfstate.backup".
+   - "terraform init" - if not init yet, 
+   - "terraform plan" - if first time build, or any tf files changed, 
+   - "terraform apply" - if no error from "terraform plan". 
+   - "terraform destroy" - if "terraform plan" has been made and remove all AWS resources have been deployed.
+2. make the Makefile to do the cleanup for:
+   1. "terraform destroy" - if "terraform plan" has been made and remove all AWS resources have been deployed first.
+   2. the directory ".terraform",
+   3. the files ".terraform.lock.hcl", "terraform.tfstate", and "terraform.tfstate.backup".
 
