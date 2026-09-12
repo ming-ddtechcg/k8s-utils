@@ -36,3 +36,9 @@ To destroy the cluster:
 terraform destroy
 ```
 
+## Makefile support
+
+The Makefile file is generated from the claude code to simply the terraform flow.  It's document is at:
+
+[claude-v1.txt](./docs/claude-v1.txt)
+
