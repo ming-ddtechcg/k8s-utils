@@ -11,3 +11,22 @@ $ terraform init
 $ terraform plan
 $ terraform apply --auto-approve
 ```
+
+After the cluster creation is completed, the kubernetes configuration can be retrieved with following step:
+
+```bash
+aws eks update-kubeconfig \
+    --name test-cluster \
+    --region us-east-2
+```
+
+output:
+
+```
+$ kubectl get nodes
+NAME                                       STATUS   ROLES    AGE     VERSION
+ip-10-0-14-26.us-east-2.compute.internal   Ready    <none>   8m32s   v1.36.3-eks-cb19647
+ip-10-0-18-78.us-east-2.compute.internal   Ready    <none>   8m30s   v1.36.3-eks-cb19647
+ip-10-0-8-201.us-east-2.compute.internal   Ready    <none>   8m46s   v1.36.3-eks-cb19647
+```
+
