@@ -1,0 +1,11 @@
+Project Plan - EKS Managed Node Group
+=====================================
+
+1. build the Makefile to execute:
+   - "terraform init" (if not init yet), 
+   - "terraform plan" (if first time build, or any tf files changed), 
+   - "terraform apply" (if no error from "terraform plan"). 
+2. make the Makefile can do the cleanup for:
+   - the directory ".terraform",
+   - the files ".terraform.lock.hcl", "terraform.tfstate", and "terraform.tfstate.backup".
+
