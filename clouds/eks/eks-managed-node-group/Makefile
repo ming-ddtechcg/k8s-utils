@@ -1,7 +1,7 @@
 TF_FILES := $(wildcard *.tf)
 PLAN_FILE := tfplan
 
-.PHONY: all init plan apply clean
+.PHONY: all init plan apply destroy clean
 
 all: apply
 
@@ -31,5 +31,25 @@ apply: $(PLAN_FILE)
 	terraform apply "$(PLAN_FILE)"
 	@rm -f $(PLAN_FILE)
 
+# Only destroys if init has happened and the state file shows resources are
+# actually deployed. Prompts for confirmation via terraform's own destroy
+# prompt; any stale plan file is dropped afterwards since state has changed.
+destroy: .terraform
+	@if [ ! -f terraform.tfstate ]; then \
+		echo "No terraform.tfstate found - run 'make apply' first."; \
+		exit 1; \
+	fi; \
+	if [ -z "$$(terraform state list)" ]; then \
+		echo "No resources found in state - nothing to destroy."; \
+		exit 1; \
+	fi
+	terraform destroy
+	@rm -f $(PLAN_FILE)
+
+# Destroys any deployed AWS resources first (stopping here if that fails or
+# is declined), then removes the local terraform state/init artifacts.
 clean:
+	@if [ -f terraform.tfstate ] && [ -d .terraform ] && [ -n "$$(terraform state list 2>/dev/null)" ]; then \
+		$(MAKE) destroy; \
+	fi
 	rm -rf .terraform .terraform.lock.hcl terraform.tfstate terraform.tfstate.backup $(PLAN_FILE)
