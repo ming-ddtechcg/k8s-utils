@@ -30,3 +30,9 @@ ip-10-0-18-78.us-east-2.compute.internal   Ready    <none>   8m30s   v1.36.3-eks
 ip-10-0-8-201.us-east-2.compute.internal   Ready    <none>   8m46s   v1.36.3-eks-cb19647
 ```
 
+To destroy the cluster:
+
+```bash
+terraform destroy
+```
+
