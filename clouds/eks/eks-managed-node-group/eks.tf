@@ -24,9 +24,10 @@ module "eks" {
       before_compute = true
     }
     metrics-server = {}
-    eks-pod-identity-agent = {
-      before_compute = true
-    }
+    # eks-pod-identity-agent uses the port 80 with the hostNetwork deployment
+    #eks-pod-identity-agent = {
+    #  before_compute = true
+    #}
   }
 
   # Specific Managed Node Groups Configuration
