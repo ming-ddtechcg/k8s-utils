@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-webservice
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  namespace: test-webservice
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: test-cluster-clb-1171397965.us-east-2.elb.amazonaws.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: test-webservice
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+

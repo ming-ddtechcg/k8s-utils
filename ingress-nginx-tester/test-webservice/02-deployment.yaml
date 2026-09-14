@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-webservice
+  labels:
+    app: test-webservice
+  namespace: test-webservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test-webservice
+  template:
+    metadata:
+      labels:
+        app: test-webservice
+    spec:
+      containers:
+      - name: test-webservice
+        image: nginx
+        ports:
+        - containerPort: 80
+
