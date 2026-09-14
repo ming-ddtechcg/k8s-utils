@@ -1,0 +1,16 @@
+Project Plan - EKS Managed Node Group
+=====================================
+
+1. Makefile targets for the Terraform lifecycle:
+   - init    - run "terraform init" if the working directory has not been initialized yet.
+   - plan    - run "terraform plan" on first build, or whenever any .tf file has changed.
+   - apply   - run "terraform apply" only if "terraform plan" completed without error.
+   - destroy - run "terraform destroy" only if a "terraform plan" has been made and AWS
+               resources have actually been deployed.
+
+2. Makefile cleanup target(s):
+   1. run "terraform destroy" first, if a "terraform plan" has been made and AWS
+      resources have been deployed, to tear down all deployed resources.
+   2. remove the ".terraform" directory.
+   3. remove the files ".terraform.lock.hcl", "terraform.tfstate", and
+      "terraform.tfstate.backup".
