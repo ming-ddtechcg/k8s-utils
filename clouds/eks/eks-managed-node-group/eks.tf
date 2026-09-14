@@ -59,5 +59,25 @@ module "eks" {
     }
   }
 
+  # add the addiitonal rules for the ingress controller if the controller will be installed
+  node_security_group_additional_rules = {
+    ingress_http = {
+      description = "Allow HTTP from anywhere"
+      protocol    = "tcp"
+      from_port   = 80
+      to_port     = 80
+      type        = "ingress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress_https = {
+      description = "Allow HTTPS from anywhere"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
   tags = local.tags
 }
