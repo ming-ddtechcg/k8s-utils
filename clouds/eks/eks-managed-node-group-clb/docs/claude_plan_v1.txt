@@ -1,0 +1,20 @@
+Project Plan - EKS Managed Node Group with Classic Load Balancer
+================================================================
+
+Based on the existing terraform source codes (*.tf), this project will add the following AWS resources:
+- Classic Load Balancer (CLB)
+- Target Group (TG)
+in a separate terraform file for:
+1. create a TG and attached with the all of Auto Scaling Groups (ASGs) that created by the modele "eks" in the terraform resource "eks_managed_node_groups".
+2. create a CLB and attached with the Target Group from the above with following requriements:
+   - CLB is the public facining.
+   - CLB will route to all availbility zones.
+   - CLB will be assoicated with the security groups that created by the model "eks", and the security groups have the rules to handle the public inbound ports, 80 and 443.
+3. create a "Makefile" file to execute for the following commands:
+   - "make init" - likes "terraform init" and if not init yet.
+   - "make plan" - likes "terraform plan" to preview the infrastructure or update changes and produce with "-out tfplan". if terraform init has not been made, executes "make init" first.  
+   - "make apply" - to perform "make plan" if "terraform apply" has not been made first, then performs "terraform apply" (with "tfplan" if the file exists, otherwise ignore "tfplan"). 
+   - "make destroy" - likes "terraform destroy" to remove all deployed AWS resources if all AWS resources have been deployed.
+4. make the Makefile to do the cleanup for:
+   1. perform "make destroy"
+   2. clean up directories or files that created by terraform.

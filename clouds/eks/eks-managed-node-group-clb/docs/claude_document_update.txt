@@ -1,0 +1,1 @@
+reference the hand-write document at docs/claude_plan_v1.txt, generate a new project plan (PROJECT_PLAN.md) for this final result and create a new claude_plan_v2.txt.

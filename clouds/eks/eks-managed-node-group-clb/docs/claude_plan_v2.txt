@@ -1,0 +1,37 @@
+Project Plan - EKS Managed Node Group with Classic Load Balancer
+==================================================================
+
+1. Classic Load Balancer (clb.tf):
+   - Classic Load Balancer (aws_elb) has no target group concept -- unlike ALB/NLB,
+     it registers EC2 instances directly against the load balancer itself.
+   - CLB is public facing (internal = false).
+   - CLB spans all public subnets, one per availability zone, with cross-zone load
+     balancing enabled, so it routes to all availability zones.
+   - CLB is associated with the security group created by the module "eks"
+     (module.eks.node_security_group_id), which has the rules to handle the public
+     inbound ports 80 and 443 (node_security_group_additional_rules in eks.tf).
+   - a listener on 80 and a listener on 443, both TCP passthrough to the same
+     instance port.
+   - a TCP health check against instance port 80.
+   - the public DNS name of the CLB is exposed via the "clb_dns_name" output.
+
+2. Auto Scaling Group attachment (clb.tf):
+   - every Auto Scaling Group created by the module "eks" in "eks_managed_node_groups"
+     (linux-small-nodes, linux-medium-nodes) is registered directly with the CLB via
+     aws_autoscaling_attachment (one attachment per node group, since Classic ELB has
+     no per-port target groups to fan out across).
+
+3. Makefile targets for the Terraform lifecycle:
+   - "make init"    - like "terraform init", run only if not init yet.
+   - "make plan"    - like "terraform plan", to preview infrastructure creation or
+                       updates; runs "make init" first if that has not been done yet.
+   - "make apply"   - runs "make plan" first if that has not been done yet, then
+                       performs "terraform apply".
+   - "make destroy" - like "terraform destroy", to remove all deployed AWS resources,
+                       run only if AWS resources have actually been deployed.
+
+4. Makefile cleanup target:
+   1. perform "make destroy".
+   2. clean up the local directories and files created by Terraform: the
+      ".terraform" directory, ".terraform.lock.hcl", "terraform.tfstate",
+      "terraform.tfstate.backup", and the Makefile's own leftover plan file.
