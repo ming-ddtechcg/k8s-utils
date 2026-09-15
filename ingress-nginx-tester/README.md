@@ -16,14 +16,14 @@ A tester to respond a Nginx default web page back to the caller through the Ngin
 
 ## Deployment
 
-Before deployment, there is an update in "03-ingress.yaml" for the incoming URL <hostname>:
+Before deployment, there is an update in "03-ingress.yaml" for the incoming URL hostname:
 
 ```
 ...
 spec:
   ingressClassName: nginx
   rules:
-  - host: <hostname>
+  - host: <hostname> <== update this
     http:
       paths:
       - backend:
