@@ -2,16 +2,23 @@
 
 ## 1. Makefile: Terraform lifecycle targets
 
-- `init` - run `terraform init` if the working directory has not been initialized yet.
-- `plan` - run `terraform plan` on first build, or whenever any `.tf` file has changed.
-- `apply` - run `terraform apply`, only if `terraform plan` completed without error.
-- `destroy` - run `terraform destroy`, only if a `terraform plan` has been made and AWS
-  resources have actually been deployed.
+- `init` - runs `terraform init`, but only if the `.terraform/` directory doesn't
+  already exist.
+- `plan` - runs `init` first if not yet initialized, then runs
+  `terraform plan -out=tfplan`. Automatically re-plans whenever any `.tf` file has
+  changed since the last plan (compared by file timestamp against `tfplan`);
+  otherwise reuses the existing `tfplan`. Removes `tfplan` if the plan fails.
+- `apply` - ensures a fresh `tfplan` exists first (running `plan` if one isn't
+  already up to date), then runs `terraform apply tfplan`. Deletes `tfplan`
+  afterwards since state has changed and any prior plan is now stale.
+- `destroy` - runs `init` first if needed, then stops with a clear error if no
+  `terraform.tfstate` exists or if `terraform state list` shows no deployed
+  resources; otherwise runs `terraform destroy` (prompts for confirmation) and
+  clears any stale `tfplan`.
 
-## 2. Makefile: cleanup target
+## 2. Makefile: cleanup target (`clean`)
 
-1. Run `terraform destroy` first, if a `terraform plan` has been made and AWS resources
-   have been deployed, to tear down all deployed resources.
-2. Remove the `.terraform` directory.
-3. Remove the files `.terraform.lock.hcl`, `terraform.tfstate`, and
-   `terraform.tfstate.backup`.
+1. Runs `destroy` first, but only if `.terraform/` exists, `terraform.tfstate`
+   exists, and `terraform state list` shows deployed resources.
+2. Removes `.terraform/`, `.terraform.lock.hcl`, `terraform.tfstate`,
+   `terraform.tfstate.backup`, and `tfplan`.

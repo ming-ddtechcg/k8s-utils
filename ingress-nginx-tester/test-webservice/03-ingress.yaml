@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: test-cluster-clb-1171397965.us-east-2.elb.amazonaws.com
+  - host: <hostname>
     http:
       paths:
       - backend:

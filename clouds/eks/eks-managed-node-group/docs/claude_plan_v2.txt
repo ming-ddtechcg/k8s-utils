@@ -1,16 +1,20 @@
-Project Plan - EKS Managed Node Group
+Project Plan - EKS Managed Node Group (v2)
 =====================================
 
-1. Makefile targets for the Terraform lifecycle:
-   - init    - run "terraform init" if the working directory has not been initialized yet.
-   - plan    - run "terraform plan" on first build, or whenever any .tf file has changed.
-   - apply   - run "terraform apply" only if "terraform plan" completed without error.
-   - destroy - run "terraform destroy" only if a "terraform plan" has been made and AWS
-               resources have actually been deployed.
-
-2. Makefile cleanup target(s):
-   1. run "terraform destroy" first, if a "terraform plan" has been made and AWS
-      resources have been deployed, to tear down all deployed resources.
-   2. remove the ".terraform" directory.
-   3. remove the files ".terraform.lock.hcl", "terraform.tfstate", and
-      "terraform.tfstate.backup".
+1. Makefile commands - final behavior:
+   - "make init" - runs "terraform init", but only if the ".terraform" directory
+     doesn't already exist.
+   - "make plan" - runs "make init" first if not yet initialized, then runs
+     "terraform plan -out=tfplan". automatically re-plans if any ".tf" file
+     changed since the last plan, otherwise reuses the existing "tfplan".
+     removes "tfplan" if the plan fails.
+   - "make apply" - always makes sure a fresh "tfplan" exists first (via
+     "make plan"), then runs "terraform apply tfplan". deletes "tfplan"
+     afterwards since state has changed and any prior plan is now stale.
+   - "make destroy" - runs "make init" first if needed, then stops with an
+     error message if "terraform.tfstate" is missing or no resources are in
+     state; otherwise runs "terraform destroy" and removes any stale "tfplan".
+2. "make clean" - cleanup target:
+   1. runs "make destroy" first, but only if resources are actually deployed.
+   2. removes ".terraform", ".terraform.lock.hcl", "terraform.tfstate",
+      "terraform.tfstate.backup", and "tfplan".

@@ -1,6 +1,6 @@
 output "cluster_name" {
   description = "The Kubernetes cluster name <cluster-name>"
-  value       = "${local.name}-cluster"
+  value       = module.eks.cluster_name
 }
 
 output "region" {
