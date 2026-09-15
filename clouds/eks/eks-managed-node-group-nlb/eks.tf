@@ -1,0 +1,83 @@
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 21.0"
+
+  name                                      = "${local.name}-cluster"
+  kubernetes_version                        = "1.36"
+
+  # Networking
+  vpc_id                                    = module.vpc.vpc_id
+  subnet_ids                                = module.vpc.private_subnets
+
+  # Access configuration
+  endpoint_public_access                    = true
+  #endpoint_public_access_cidrs              = ["68.196.246.60/32"]
+  endpoint_public_access_cidrs              = ["0.0.0.0/0"]
+  enable_cluster_creator_admin_permissions  = true
+
+  # EKS Addons
+  # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/README.md#input_addons
+  addons = {
+    coredns = {}
+    kube-proxy = {}
+    vpc-cni = {
+      before_compute = true
+    }
+    metrics-server = {}
+    # eks-pod-identity-agent uses the port 80 with the hostNetwork deployment
+    #eks-pod-identity-agent = {
+    #  before_compute = true
+    #}
+  }
+
+  # Specific Managed Node Groups Configuration
+  # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
+  eks_managed_node_groups = {
+    linux-small-nodes = {
+      name = "${local.name}-linux-small-node"
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      instance_types = ["t3.small"]
+      ami_type       = "AL2023_x86_64_STANDARD"
+
+      min_size = 2
+      max_size = 4
+      # This value is ignored after the initial creation
+      # https://github.com/bryantbiggs/eks-desired-size-hack
+      desired_size = 2
+    }
+    linux-medium-nodes = {
+      name = "${local.name}-linux-medium-node"
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      instance_types = ["t3.medium"]
+      ami_type       = "AL2023_x86_64_STANDARD"
+
+      min_size = 1
+      max_size = 4
+      # This value is ignored after the initial creation
+      # https://github.com/bryantbiggs/eks-desired-size-hack
+      desired_size = 1
+    }
+  }
+
+  # add the addiitonal rules for the ingress controller if the controller will be installed
+  node_security_group_additional_rules = {
+    ingress_http = {
+      description = "Allow HTTP from anywhere"
+      protocol    = "tcp"
+      from_port   = 80
+      to_port     = 80
+      type        = "ingress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress_https = {
+      description = "Allow HTTPS from anywhere"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
+  tags = local.tags
+}

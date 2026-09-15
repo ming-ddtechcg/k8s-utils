@@ -1,0 +1,35 @@
+Project Plan - EKS Managed Node Group with Network Load Balancer
+==================================================================
+
+1. Target Group (nlb.tf):
+   - a Target Group is created per listener port, 80 and 443, target_type "instance",
+     protocol TCP, in the same VPC as the EKS cluster.
+   - every Auto Scaling Group created by the module "eks" in "eks_managed_node_groups"
+     (linux-small-nodes, linux-medium-nodes) is attached to both Target Groups via
+     aws_autoscaling_attachment.
+
+2. Network Load Balancer (nlb.tf), attached to the Target Groups from above:
+   - NLB is public facing (internal = false).
+   - NLB spans all public subnets, one per availability zone, with cross-zone load
+     balancing enabled, so it routes to all availability zones.
+   - NLB is associated with the security group created by the module "eks"
+     (module.eks.node_security_group_id), which has the rules to handle the public
+     inbound ports 80 and 443 (node_security_group_additional_rules in eks.tf).
+   - a listener on TCP/80 forwards to the http Target Group, and a listener on
+     TCP/443 forwards to the https Target Group.
+   - the public DNS name of the NLB is exposed via the "nlb_dns_name" output.
+
+3. Makefile targets for the Terraform lifecycle:
+   - "make init"    - like "terraform init", run only if not init yet.
+   - "make plan"    - like "terraform plan", to preview infrastructure creation or
+                       updates; runs "make init" first if that has not been done yet.
+   - "make apply"   - runs "make plan" first if that has not been done yet, then
+                       performs "terraform apply".
+   - "make destroy" - like "terraform destroy", to remove all deployed AWS resources,
+                       run only if AWS resources have actually been deployed.
+
+4. Makefile cleanup target:
+   1. perform "make destroy".
+   2. clean up the local directories and files created by Terraform: the
+      ".terraform" directory, ".terraform.lock.hcl", "terraform.tfstate",
+      "terraform.tfstate.backup", and the Makefile's own leftover plan file.
