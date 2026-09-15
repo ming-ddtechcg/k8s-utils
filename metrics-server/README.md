@@ -41,3 +41,11 @@ Metrics Server is to collect metrics from all nodes' kubelet cAdvisor, and expos
 └── README.md
 ```
 
+Note:
+| directory name | comment |
+| --- | --- |
+| base-images | The process is to build the package required container image. |
+| <package name>/chart | The kubernetes resources with the Helm chart manifest files. |
+| deploy-env | The Helm chart deployment value.yaml for dev (development) and prod (production) configurations. |
+| utils | all utility files are the deployment and the troubleshot. |
+
