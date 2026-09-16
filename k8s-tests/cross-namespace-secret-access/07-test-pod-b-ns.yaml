@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: test
+  name: test
+  namespace: b-ns
+spec:
+  containers:
+  - image: harbor.ddtechcg.com:5001/playground/alpine-kubectl:1.36.4
+    name: test
+    command:
+    - sh
+    - -c 
+    - "sleep 1d"
+  serviceAccount: access-a-ns-test-secret
+  serviceAccountName: access-a-ns-test-secret
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
