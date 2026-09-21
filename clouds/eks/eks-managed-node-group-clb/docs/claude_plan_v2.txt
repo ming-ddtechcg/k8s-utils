@@ -1,37 +1,40 @@
 Project Plan - EKS Managed Node Group with Classic Load Balancer
 ==================================================================
 
+Based on the hand-written plan (docs/claude_plan_v1.txt) and the existing terraform
+source codes (*.tf), this project adds a public-facing Classic Load Balancer (CLB) in
+front of the EKS managed node groups, in a separate terraform file (clb.tf).
+
+Change from plan v1:
+   - v1 asked for a Target Group (TG) attached to the Auto Scaling Groups (ASGs), with
+     the CLB attached to that TG. A Classic Load Balancer (aws_elb) has no target group
+     concept -- only ALB/NLB do. The CLB registers instances directly, so the TG is
+     dropped and the ASGs are attached to the CLB itself.
+
 1. Classic Load Balancer (clb.tf):
-   - Classic Load Balancer (aws_elb) has no target group concept -- unlike ALB/NLB,
-     it registers EC2 instances directly against the load balancer itself.
-   - CLB is public facing (internal = false).
-   - CLB spans all public subnets, one per availability zone, with cross-zone load
-     balancing enabled, so it routes to all availability zones.
+   - CLB (aws_elb.this) is public facing (internal = false).
+   - CLB spans all public subnets of the VPC (module.vpc.public_subnets, one per
+     availability zone) with cross-zone load balancing enabled, so it routes to all
+     availability zones.
    - CLB is associated with the security group created by the module "eks"
      (module.eks.node_security_group_id), which has the rules to handle the public
-     inbound ports 80 and 443 (node_security_group_additional_rules in eks.tf).
+     inbound ports 80 and 443 (node_security_group_additional_rules in eks.tf,
+     cidr_blocks 0.0.0.0/0).
    - a listener on 80 and a listener on 443, both TCP passthrough to the same
-     instance port.
-   - a TCP health check against instance port 80.
-   - the public DNS name of the CLB is exposed via the "clb_dns_name" output.
+     instance port (no certificate / TLS termination on the CLB).
+   - a TCP health check against instance port 80 (interval 10s, timeout 5s,
+     healthy/unhealthy threshold 3).
 
 2. Auto Scaling Group attachment (clb.tf):
-   - every Auto Scaling Group created by the module "eks" in "eks_managed_node_groups"
-     (linux-small-nodes, linux-medium-nodes) is registered directly with the CLB via
-     aws_autoscaling_attachment (one attachment per node group, since Classic ELB has
-     no per-port target groups to fan out across).
+   - every ASG created by the module "eks" in "eks_managed_node_groups"
+     (linux-small-nodes, linux-medium-nodes) is registered with the CLB via
+     aws_autoscaling_attachment (one attachment per node group, using
+     node_group_autoscaling_group_names[0]).
 
-3. Makefile targets for the Terraform lifecycle:
-   - "make init"    - like "terraform init", run only if not init yet.
-   - "make plan"    - like "terraform plan", to preview infrastructure creation or
-                       updates; runs "make init" first if that has not been done yet.
-   - "make apply"   - runs "make plan" first if that has not been done yet, then
-                       performs "terraform apply".
-   - "make destroy" - like "terraform destroy", to remove all deployed AWS resources,
-                       run only if AWS resources have actually been deployed.
+3. Output (outputs.tf):
+   - "clb_dns_name" exposes the public DNS name of the CLB.
 
-4. Makefile cleanup target:
-   1. perform "make destroy".
-   2. clean up the local directories and files created by Terraform: the
-      ".terraform" directory, ".terraform.lock.hcl", "terraform.tfstate",
-      "terraform.tfstate.backup", and the Makefile's own leftover plan file.
+4. Notes:
+   - the instances report OutOfService on the CLB health check until something listens
+     on port 80 on the nodes (e.g. an ingress controller deployed with hostNetwork).
+   - the configuration passes "terraform validate"; it has not been planned or applied.

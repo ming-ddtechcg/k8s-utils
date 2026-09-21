@@ -2,23 +2,23 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name                                      = "${local.name}-cluster"
-  kubernetes_version                        = "1.36"
+  name               = "${local.name}-cluster"
+  kubernetes_version = "1.36"
 
   # Networking
-  vpc_id                                    = module.vpc.vpc_id
-  subnet_ids                                = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
   # Access configuration
-  endpoint_public_access                    = true
+  endpoint_public_access = true
   #endpoint_public_access_cidrs              = ["68.196.246.60/32"]
-  endpoint_public_access_cidrs              = ["0.0.0.0/0"]
-  enable_cluster_creator_admin_permissions  = true
+  endpoint_public_access_cidrs             = ["0.0.0.0/0"]
+  enable_cluster_creator_admin_permissions = true
 
   # EKS Addons
   # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/README.md#input_addons
   addons = {
-    coredns = {}
+    coredns    = {}
     kube-proxy = {}
     vpc-cni = {
       before_compute = true
