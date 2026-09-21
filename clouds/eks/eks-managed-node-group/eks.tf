@@ -34,7 +34,8 @@ module "eks" {
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
   eks_managed_node_groups = {
     linux-micro-nodes = {
-      name = "${local.name}-linux-micro-node"
+      name                     = "${local.name}-linux-micro-nodes"
+      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       instance_types = ["t3.micro"]
       ami_type       = "AL2023_x86_64_STANDARD"
@@ -46,7 +47,8 @@ module "eks" {
       desired_size = 2
     }
     linux-small-nodes = {
-      name = "${local.name}-linux-small-node"
+      name                     = "${local.name}-linux-small-nodes"
+      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       instance_types = ["t3.small"]
       ami_type       = "AL2023_x86_64_STANDARD"

@@ -16,6 +16,5 @@ module "vpc" {
   single_nat_gateway     = false
   one_nat_gateway_per_az = false
 
-
   tags = local.tags
 }
