@@ -1,6 +1,5 @@
-
 resource "aws_security_group" "node_ssh" {
-  name_prefix = "${local.name}-node-ssh-"
+  name_prefix = "${var.deployment_name}-node-ssh-"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
@@ -20,3 +19,4 @@ resource "aws_security_group" "node_ssh" {
 
   tags = local.tags
 }
+

@@ -2,19 +2,17 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name               = "${local.name}-cluster"
-  kubernetes_version = "1.36"
+  name               = "${var.deployment_name}-cluster"
+  kubernetes_version = var.kubernetes_version
 
   # Networking
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-
   # Access configuration
-  endpoint_public_access = true
-  #endpoint_public_access_cidrs            = ["68.196.246.60/32"]
-  endpoint_public_access_cidrs             = ["0.0.0.0/0"]
-  enable_cluster_creator_admin_permissions = true
+  endpoint_public_access                   = var.endpoint_public_access
+  endpoint_public_access_cidrs             = var.public_access_cidrs
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
 
   # EKS Addons
   # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/README.md#input_addons
@@ -25,75 +23,35 @@ module "eks" {
       before_compute = true
     }
     metrics-server = {}
+    # eks-pod-identity-agent uses the port 80 with the hostNetwork deployment
     #eks-pod-identity-agent = {
     #  before_compute = true
     #}
   }
 
+  upgrade_policy = {
+    support_type = var.upgrade_policy
+  }
+
   # Specific Managed Node Groups Configuration
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
   eks_managed_node_groups = {
-    linux-small-nodes = {
-      name                     = "${local.name}-linux-small-nodes"
-      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.small"]
-      ami_type       = "AL2023_x86_64_STANDARD"
+    for key, node in var.eks_managed_nodes : key => {
+      name                     = "${var.deployment_name}-${key}"
+      iam_role_use_name_prefix = node.iam_role_use_name_prefix # terraform will/won't appends a unique suffix
+      instance_types           = node.instance_types
+      ami_type                 = node.ami_type
 
-      min_size = 2
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 2
+      min_size     = node.min_size
+      max_size     = node.max_size
+      desired_size = node.desired_size
 
-      use_custom_launch_template = true       # required — key_name only applies via the launch template
-      key_name                   = "eks-node" # goes directly on the launch template
+      use_custom_launch_template = node.use_custom_launch_template
+      key_name                   = node.key_name
 
-      vpc_security_group_ids = [
-        aws_security_group.node_ssh.id # SG with an ingress rule for port 22
-      ]
-    }
-    linux-medium-nodes = {
-      name                     = "${local.name}-linux-medium-nodes"
-      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.medium"]
-      ami_type       = "AL2023_x86_64_STANDARD"
+      vpc_security_group_ids = node.has_vpc_security_group_ids ? [aws_security_group.node_ssh.id] : []
 
-      min_size = 1
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 2
-
-      # https://github.com/terraform-aws-modules/terraform-aws-eks/issues/3180#issuecomment-2446452416
-      # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/compute_resources.md#eks-managed-node-groups
-      block_device_mappings = {
-        xvda = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 100
-            volume_type           = "gp3"
-            iops                  = 3000
-            throughput            = 150
-            encrypted             = true
-            delete_on_termination = true
-          }
-        }
-      }
-
-      use_custom_launch_template = true       # required — key_name only applies via the launch template
-      key_name                   = "eks-node" # goes directly on the launch template
-
-      vpc_security_group_ids = [
-        aws_security_group.node_ssh.id # SG with an ingress rule for port 22
-      ]
-
-      # the following will be conflict with block_device_mappings
-      #   use_custom_launch_template = false
-      #   remote_access = {
-      #     ec2_ssh_key = "eks-node"
-      #   }
+      block_device_mappings = node.block_device_mappings
     }
   }
 
@@ -115,14 +73,6 @@ module "eks" {
       type        = "ingress"
       cidr_blocks = ["0.0.0.0/0"]
     }
-    # ingress_ssh = {
-    #   description = "SSH from bastion"
-    #   protocol    = "tcp"
-    #   from_port   = 22
-    #   to_port     = 22
-    #   type        = "ingress"
-    #   cidr_blocks = ["10.0.0.0/16"]
-    # }
   }
 
   tags = local.tags

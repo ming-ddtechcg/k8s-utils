@@ -4,16 +4,17 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "6.7.2"
 
-  name = "${local.name}-vpc"
-  cidr = local.vpc_cidr
+  name = "${var.deployment_name}-vpc"
+  cidr = var.vpc_cidr
 
-  azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
+  azs             = var.azs
+  private_subnets = [for k, v in var.azs : cidrsubnet(var.vpc_cidr, 4, k)]
+  public_subnets  = [for k, v in var.azs : cidrsubnet(var.vpc_cidr, 8, k + 48)]
+  #intra_subnets   = [for k, v in var.azs : cidrsubnet(var.vpc_cidr, 8, k + 52)]
 
-  enable_nat_gateway     = true
-  single_nat_gateway     = false
-  one_nat_gateway_per_az = false
+  enable_nat_gateway     = var.enable_nat_gateway
+  single_nat_gateway     = var.single_nat_gateway
+  one_nat_gateway_per_az = var.one_nat_gateway_per_az
 
   tags = local.tags
 }
@@ -21,10 +22,10 @@ module "vpc" {
 # module "endpoints" {
 #   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 #   version = "~> 6.7"
-
+#
 #   vpc_id             = module.vpc.vpc_id
 #   security_group_ids = [aws_security_group.node_ssh.id]
-
+#
 #   endpoints = {
 #     # Gateway Endpoint (SSH)
 #     ssh = {
@@ -38,7 +39,7 @@ module "vpc" {
 #         Name = "${local.name}-ssh-gateway-endpoint"
 #       })
 #     },
-
+#
 #     # Interface Endpoint (ECR API)
 #     ecr_api = {
 #       service             = "ecr.api"
@@ -49,7 +50,7 @@ module "vpc" {
 #       })
 #     }
 #   }
-
+#
 #   tags = merge(local.tags, {
 #     Name = "${local.name}-vpc-endpoint"
 #   })
