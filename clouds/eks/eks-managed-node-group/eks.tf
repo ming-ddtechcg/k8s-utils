@@ -36,31 +36,15 @@ module "eks" {
   # Specific Managed Node Groups Configuration
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
   eks_managed_node_groups = {
-    linux-micro-nodes = {
-      name                     = "${var.deployment_name}-linux-micro-nodes"
-      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.micro"]
-      ami_type       = "AL2023_x86_64_STANDARD"
+    for key, node in var.eks_managed_nodes : key => {
+      name                     = "${var.deployment_name}-${key}"
+      iam_role_use_name_prefix = node.iam_role_use_name_prefix # terraform will/won't appends a unique suffix
+      instance_types           = node.instance_types
+      ami_type                 = node.ami_type
 
-      min_size = 2
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 2
-    }
-    linux-small-nodes = {
-      name                     = "${var.deployment_name}-linux-small-nodes"
-      iam_role_use_name_prefix = false # terraform will not appends a unique suffix
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.small"]
-      ami_type       = "AL2023_x86_64_STANDARD"
-
-      min_size = 1
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 1
+      min_size     = node.min_size
+      max_size     = node.max_size
+      desired_size = node.desired_size
     }
   }
 

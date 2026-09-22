@@ -74,3 +74,33 @@ variable "upgrade_policy" {
   type        = string
   default     = "STANDARD"
 }
+
+variable "eks_managed_nodes" {
+  description = "The node definitions in the EKS managed node groups"
+  type = map(object({
+    iam_role_use_name_prefix = bool
+    instance_types           = list(string)
+    ami_type                 = string
+    min_size                 = number
+    max_size                 = number
+    desired_size             = number
+  }))
+  default = {
+    linux-micro-nodes = {
+      iam_role_use_name_prefix = false
+      instance_types           = ["t3.micro"]
+      ami_type                 = "AL2023_x86_64_STANDARD"
+      min_size                 = 2
+      max_size                 = 4
+      desired_size             = 2
+    }
+    linux-medium-nodes = {
+      iam_role_use_name_prefix = false
+      instance_types           = ["t3.medium"]
+      ami_type                 = "AL2023_x86_64_STANDARD"
+      min_size                 = 1
+      max_size                 = 4
+      desired_size             = 1
+    }
+  }
+}
