@@ -78,7 +78,7 @@ variable "upgrade_policy" {
 variable "eks_managed_nodes" {
   description = "The node definitions in the EKS managed node groups"
   type = map(object({
-    iam_role_use_name_prefix = bool
+    iam_role_use_name_prefix = optional(bool, true)
     instance_types           = list(string)
     ami_type                 = string
     min_size                 = number
