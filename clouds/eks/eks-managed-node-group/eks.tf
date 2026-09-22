@@ -2,18 +2,17 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name               = "${local.name}-cluster"
-  kubernetes_version = "1.36"
+  name               = "${var.deployment_name}-cluster"
+  kubernetes_version = var.kubernetes_version
 
   # Networking
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
   # Access configuration
-  endpoint_public_access = true
-  #endpoint_public_access_cidrs              = ["68.196.246.60/32"]
-  endpoint_public_access_cidrs             = ["0.0.0.0/0"]
-  enable_cluster_creator_admin_permissions = true
+  endpoint_public_access                   = var.endpoint_public_access
+  endpoint_public_access_cidrs             = var.public_access_cidrs
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
 
   # EKS Addons
   # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/README.md#input_addons
@@ -30,11 +29,15 @@ module "eks" {
     #}
   }
 
+  upgrade_policy = {
+    support_type = var.upgrade_policy
+  }
+
   # Specific Managed Node Groups Configuration
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
   eks_managed_node_groups = {
     linux-micro-nodes = {
-      name                     = "${local.name}-linux-micro-nodes"
+      name                     = "${var.deployment_name}-linux-micro-nodes"
       iam_role_use_name_prefix = false # terraform will not appends a unique suffix
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       instance_types = ["t3.micro"]
@@ -47,7 +50,7 @@ module "eks" {
       desired_size = 2
     }
     linux-small-nodes = {
-      name                     = "${local.name}-linux-small-nodes"
+      name                     = "${var.deployment_name}-linux-small-nodes"
       iam_role_use_name_prefix = false # terraform will not appends a unique suffix
       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       instance_types = ["t3.small"]
