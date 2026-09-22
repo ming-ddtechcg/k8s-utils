@@ -3,7 +3,7 @@ resource "aws_security_group" "node_ssh" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "SSH from bastion/CIDR"
+    description = "SSH from node/CIDR"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
