@@ -2,18 +2,17 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name               = "${local.name}-cluster"
-  kubernetes_version = "1.36"
+  name               = "${var.deployment_name}-cluster"
+  kubernetes_version = var.kubernetes_version
 
   # Networking
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
   # Access configuration
-  endpoint_public_access = true
-  #endpoint_public_access_cidrs              = ["68.196.246.60/32"]
-  endpoint_public_access_cidrs             = ["0.0.0.0/0"]
-  enable_cluster_creator_admin_permissions = true
+  endpoint_public_access                   = var.endpoint_public_access
+  endpoint_public_access_cidrs             = var.public_access_cidrs
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
 
   # EKS Addons
   # https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/README.md#input_addons
@@ -30,32 +29,22 @@ module "eks" {
     #}
   }
 
+  upgrade_policy = {
+    support_type = var.upgrade_policy
+  }
+
   # Specific Managed Node Groups Configuration
   # https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/18.2.7/examples/eks_managed_node_group
   eks_managed_node_groups = {
-    linux-small-nodes = {
-      name = "${local.name}-linux-small-node"
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.small"]
-      ami_type       = "AL2023_x86_64_STANDARD"
+    for key, node in var.eks_managed_nodes : key => {
+      name                     = "${var.deployment_name}-${key}"
+      iam_role_use_name_prefix = node.iam_role_use_name_prefix # terraform will/won't appends a unique suffix
+      instance_types           = node.instance_types
+      ami_type                 = node.ami_type
 
-      min_size = 2
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 2
-    }
-    linux-medium-nodes = {
-      name = "${local.name}-linux-medium-node"
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
-      instance_types = ["t3.medium"]
-      ami_type       = "AL2023_x86_64_STANDARD"
-
-      min_size = 1
-      max_size = 4
-      # This value is ignored after the initial creation
-      # https://github.com/bryantbiggs/eks-desired-size-hack
-      desired_size = 1
+      min_size     = node.min_size
+      max_size     = node.max_size
+      desired_size = node.desired_size
     }
   }
 

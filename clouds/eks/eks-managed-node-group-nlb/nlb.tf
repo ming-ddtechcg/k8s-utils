@@ -20,7 +20,7 @@ locals {
 resource "aws_lb_target_group" "this" {
   for_each = local.nlb_listeners
 
-  name        = "${local.name}-${each.key}-tg"
+  name        = "${var.deployment_name}-${each.key}-tg"
   port        = each.value.port
   protocol    = each.value.protocol
   vpc_id      = module.vpc.vpc_id
@@ -60,7 +60,7 @@ resource "aws_autoscaling_attachment" "this" {
 # Public-facing NLB spanning all public subnets (one per AZ), associated
 # with the eks module's node security group (which allows 80/443 inbound).
 resource "aws_lb" "this" {
-  name               = "${local.name}-nlb"
+  name               = "${var.deployment_name}-nlb"
   load_balancer_type = "network"
   internal           = false
 

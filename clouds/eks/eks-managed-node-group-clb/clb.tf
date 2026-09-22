@@ -22,7 +22,7 @@ locals {
 # AZ), associated with the eks module's node security group (which allows
 # 80/443 inbound).
 resource "aws_elb" "this" {
-  name     = "${local.name}-clb"
+  name     = "${var.deployment_name}-clb"
   internal = false
 
   subnets         = module.vpc.public_subnets
