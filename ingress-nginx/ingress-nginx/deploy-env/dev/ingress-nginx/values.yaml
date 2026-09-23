@@ -15,7 +15,7 @@ service:
 
 controller:
   name: ingress-nginx
-  image: harbor.ddtechcg.com/k8s-utils/ingress-nginx-controller:v1.11.2 
+  image: harbor.ddtechcg.com:5001/k8s-utils/ingress-nginx-controller:v1.11.2 
   ports:
     http_port_name: http
     http_port: "80"
@@ -33,16 +33,16 @@ admission:
 
 admission_create:
   name: ingress-nginx-admission-create
-  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
+  image: harbor.ddtechcg.com:5001/k8s-utils/kube-webhook-certgen:v1.4.3
 
 admission_patch:
   name: ingress-nginx-admission-patch
-  image: harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3
+  image: harbor.ddtechcg.com:5001/k8s-utils/kube-webhook-certgen:v1.4.3
 
 default_http_backend:
   name: default-http-backend
   replicas: "1"
-  image: harbor.ddtechcg.com/k8s-utils/defaultbackend-amd64:1.5
+  image: harbor.ddtechcg.com:5001/k8s-utils/defaultbackend-amd64:1.5
   ports:
     port: 80
     target_port: 8080 

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-docker build -f Dockerfile -t harbor.ddtechcg.com/k8s-utils/kube-webhook-certgen:v1.4.3 .
+docker build -f Dockerfile -t harbor.ddtechcg.com:5001/k8s-utils/kube-webhook-certgen:v1.4.3 .
 

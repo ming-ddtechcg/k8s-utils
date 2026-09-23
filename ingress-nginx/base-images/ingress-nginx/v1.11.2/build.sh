@@ -1,4 +1,4 @@
 #!/bin/sh
 
-docker build -f Dockerfile -t harbor.ddtechcg.com/k8s-utils/ingress-nginx-controller:v1.11.2 .
+docker build -f Dockerfile -t harbor.ddtechcg.com:5001/k8s-utils/ingress-nginx-controller:v1.11.2 .
 
