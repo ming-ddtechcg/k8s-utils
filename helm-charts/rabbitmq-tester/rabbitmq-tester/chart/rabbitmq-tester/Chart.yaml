@@ -1,0 +1,8 @@
+apiVersion: v2
+appVersion: "1.0"
+description: A Helm chart for RabiitMQ tester
+home: https://github.com/ming-ddtechcg/k8s-utils
+name: rabbitmq-tester
+version: 0.0.1
+
+
