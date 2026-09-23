@@ -1,0 +1,32 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ .Values.service.components.admission_webhook }}
+    app.kubernetes.io/instance: {{ .Values.controller.name }}
+    app.kubernetes.io/name: {{ .Values.controller.name }}
+    app.kubernetes.io/part-of: {{ .Values.controller.name }}
+    app.kubernetes.io/version: {{ .Values.service.version }}
+  name: {{ .Values.admission.name }}
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.admission.name }}
+      namespace: {{ .Values.service.namespace_definition.namespace }}
+      path: /networking/v1/ingresses
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: validate.nginx.ingress.kubernetes.io
+  rules:
+  - apiGroups:
+    - networking.k8s.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ingresses
+  sideEffects: None

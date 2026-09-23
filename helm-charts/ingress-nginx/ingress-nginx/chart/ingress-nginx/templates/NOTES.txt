@@ -1,0 +1,10 @@
+
+Release chart versions:
+
+0.0.1
+=======
+- the first version ingress-nginx
+
+End of the release note.
+========
+
