@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    resource-type: redis-client-config
+  name: {{ .Values.redis.name }}-client-config
+  namespace: {{ .Release.Namespace }}
+data:
+  REQUIREPASS_COMMENT: |
+    #
+    # the redis client pass
+    # note:
+    # 1. the password is the base64 encoded without newline
+    # 2. "NONE" (clear text) in the value for the redis client access without password
+    #
+  REQUIREPASS: {{ .Values.redis_and_sentinel.config.requirepass }}
+  REDIS_SERVICE_COMMENT: |
+    #
+    # the redis service domain name
+    #
+  REDIS_SERVICE: "{{ .Values.redis.name }}.{{ .Release.Namespace }}"
+  REDIS_PORT_COMMENT: |
+    #
+    # the redis process port
+    #
+  REDIS_PORT: "{{ .Values.redis.containerport }}"
+

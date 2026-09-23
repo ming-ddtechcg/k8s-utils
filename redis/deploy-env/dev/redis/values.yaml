@@ -1,0 +1,136 @@
+
+#
+# redis and sentinel services
+#
+service:
+  name: redis
+
+  nodeAffinity:
+    #
+    # node label
+    # Note: 
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+redis_networkpolicy:
+  from:
+    namespaceSelector:
+      matchLabel:
+        app: redis
+    podSelector_redis:
+      matchLabel:
+        app_client: redis
+    podSelector_redis_sentinel:
+      matchLabel:
+        app_client: redis-sentinel
+
+redis_and_sentinel:
+  config:
+    #
+    # master username
+    # note:
+    # 1. "NONE" (clear text) in the value for no master username setup
+    #
+    masteruser: "redisadm"
+    #
+    # master pass for masteruser
+    # note:
+    # 1. the password is the base64 encoded without newline
+    # 2. "NONE" (clear text) in the value for no master pass setup
+    #
+    masterauth: "cmVkaXMxMjM0IQ=="
+    #
+    # the redis client pass
+    # note:
+    # 1. the password is the base64 encoded without newline
+    # 2. "NONE" (clear text) in the value for the redis client access without password
+    #
+    requirepass: "cmVkaXM="
+
+redis:
+  name: redis 
+  image: harbor.ddtechcg.com:5001/k8s-utils/redis:8.4.0-alpine
+  replicas: 3
+  imagePullPolicy: IfNotPresent
+  containerport: 6379
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1200Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+  storage:
+    storageclass: nfs-client-retain
+    accessmodes: 
+    - ReadWriteMany
+    size: 100Gi
+  service:
+    port: 6379
+    type: ClusterIP
+  config:
+    #
+    # the redis config configmap name
+    #
+    name: redis-config-configmap
+    #
+    # to set number of databases
+    #
+    number_of_database: 16
+
+redis_sentinel:
+  name: redis-sentinel
+  image: harbor.ddtechcg.com:5001/k8s-utils/redis:8.4.0-alpine
+  replicas: 3
+  imagePullPolicy: IfNotPresent
+  containerport: 5000
+  resources:
+    limits:
+      cpu: 250m
+      memory: 300Mi
+    requests:
+      cpu: 100m
+      memory: 100Mi
+  service:
+    port: 5000
+    type: ClusterIP
+  config:
+    #
+    # the sentinel config configmap name
+    #
+    name: redis-sentinel-config-configmap
+    #
+    # a number of sentinels that agree the mastr is down
+    #
+    quorum: 2
+    #
+    # to resolve redis server hostname instead IP
+    # value: yes | no
+    #
+    resolve_hostnames: "yes"
+    #
+    # to use hostname to communicate with the redis instance
+    # value: yes | no
+    #
+    announce_hostnames: "yes"
+    #
+    # to be determined the down in milliseconds
+    #
+    down_after_milliseconds: 5000
+    #
+    # the timeout in milliseconds to failover a master to the next master
+    #
+    failover_timeout: 60000
+    #
+    # to reconfig the number of replicas that can sync with the new master concurrently
+    #
+    parallel_syncs: 1
+

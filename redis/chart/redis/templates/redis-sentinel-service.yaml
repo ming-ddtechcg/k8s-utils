@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.redis_sentinel.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterIP: None
+  ports:
+    - port: {{.Values.redis_sentinel.service.port }}
+      targetPort: {{.Values.redis_sentinel.containerport }}
+      protocol: TCP
+  type: {{.Values.redis_sentinel.service.type }}
+  selector:
+    app: {{ .Values.redis_sentinel.name }}
+

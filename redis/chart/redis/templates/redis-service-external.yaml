@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.redis.name }}-external
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{.Values.redis.service.port }}
+      targetPort: {{.Values.redis.containerport }}
+      protocol: TCP
+  type: {{.Values.redis.service.type }}
+  selector:
+    app: {{ .Values.redis.name }}
+

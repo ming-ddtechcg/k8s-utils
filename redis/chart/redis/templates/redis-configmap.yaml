@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.redis.name }}-scripts
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "scripts/redis/*").AsConfig | indent 2 }}
+

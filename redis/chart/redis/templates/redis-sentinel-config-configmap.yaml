@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.redis_sentinel.config.name }}
+  namespace: {{ .Release.Namespace }}
+data:
+  REQUIREPASS_COMMENT: |
+    #
+    # the redis client access pass
+    # note:
+    # 1. the password is the base64 encoded without newline
+    # 2. "NONE" (clear text) for in the value for the redis client access without password
+    #
+  REQUIREPASS: {{ .Values.redis_and_sentinel.config.requirepass }}
+  POD_PREFIX_NAME_COMMENT: |
+    #
+    # the prefix name of the redis sentinel statefulset pod
+    #
+  POD_PREFIX_NAME: {{ .Values.redis_sentinel.name }}
+  REDIS_SENTINEL_SERVER_PORT_COMMENT: |
+    #
+    # The sentinel server listen port
+    #
+  REDIS_SENTINEL_SERVER_PORT: "{{ .Values.redis_sentinel.containerport }}"
+  REDIS_SERVER_PORT_COMMENT: |
+    #
+    # The redis server listen port
+    #
+  REDIS_SERVER_PORT: "{{ .Values.redis.containerport }}"
+  QUORUM_COMMENT: |
+    #
+    # a number of sentinels that agree the mastr is down
+    #
+  QUORUM: "{{ .Values.redis_sentinel.config.quorum }}" 
+  RESOLVE_HOSTNAMES_COMMENT: |
+    #
+    # to resolve redis server hostname instead IP
+    # value: yes | no
+    #
+  RESOLVE_HOSTNAMES: "{{ .Values.redis_sentinel.config.resolve_hostnames }}"
+  ANNOUNCE_HOSTNAMES_COMMENT: |
+    #
+    # to use hostname to communicate with the redis instance
+    # value: yes | no
+    #
+  ANNOUNCE_HOSTNAMES: "{{ .Values.redis_sentinel.config.announce_hostnames }}"
+  DOWN_AFTER_MILLISECONDS_COMMENT: |
+    #
+    # to be determined the down in milliseconds
+    #
+  DOWN_AFTER_MILLISECONDS: "{{ .Values.redis_sentinel.config.down_after_milliseconds }}"
+  FAILOVER_TIMEOUT_COMMENT: |
+    #
+    # the timeout in milliseconds to failover a master to the next master
+    #
+  FAILOVER_TIMEOUT: "{{ .Values.redis_sentinel.config.failover_timeout }}"
+  PARALLEL_SYNCS_COMMENT: |
+    #
+    # to reconfig the number of replicas that can sync with the new master concurrently
+    #
+  PARALLEL_SYNCS: "{{ .Values.redis_sentinel.config.parallel_syncs }}"
+
+

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app: {{ .Values.redis_sentinel.name }}
+  name: {{ .Values.redis_sentinel.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingress:
+  - ports:
+    - port: {{ .Values.redis_sentinel.service.port }}
+      protocol: TCP
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app: {{ .Values.redis_networkpolicy.from.namespaceSelector.matchLabel.app }}
+      podSelector:
+        matchLabels:
+          app-client: {{ .Values.redis_networkpolicy.from.podSelector_redis.matchLabel.app_client }}
+    ports:
+    - port: {{ .Values.redis_sentinel.service.port }}
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: {{ .Values.redis_sentinel.name }}
+  policyTypes:
+  - Ingress
+
