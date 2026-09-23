@@ -16,3 +16,8 @@ module "ec2_bastion" {
 
   tags = local.tags
 }
+
+resource "aws_ec2_instance_state" "ec2_bastion_stop" {
+  instance_id = module.ec2_bastion.id
+  state       = "stopped"
+}
