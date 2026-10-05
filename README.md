@@ -5,7 +5,9 @@ Kubernetes utilities and documents
 
 ```
 .
-├── clouds
+├── infrastructures
+│   ├── clouds
+│   └── on-premises
 ├── docs
 ├── helm-charts
 ├── k8s-tests    (the test tools about k8s)
