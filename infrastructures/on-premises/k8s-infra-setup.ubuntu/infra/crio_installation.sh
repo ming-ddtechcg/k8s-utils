@@ -54,6 +54,7 @@ sudo echo "" > /dev/null
 
 echo ""
 echo "check the cri-o installation on the current system"
+sudo apt-mark unhold cri-o > /dev/null 2>&1
 sudo apt remove -y cri-o > /dev/null 2>&1
 sudo apt autoremove -y > /dev/null 2>&1
 
@@ -76,10 +77,10 @@ sudo apt-get update
 sudo apt-get install -y software-properties-common curl
 
 curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_PACKAGE_VERSION/deb/Release.key \
-    | gpg --batch --yes --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+    | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
 
 echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/$CRIO_PACKAGE_VERSION/deb/ /" \
-    | tee /etc/apt/sources.list.d/cri-o.list
+    | sudo tee /etc/apt/sources.list.d/cri-o.list
 
 sudo apt-get install -y cri-o
 
