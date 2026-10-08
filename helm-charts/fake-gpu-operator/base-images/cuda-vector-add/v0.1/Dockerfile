@@ -1,0 +1,1 @@
+FROM mirrorgooglecontainers/cuda-vector-add:v0.1
