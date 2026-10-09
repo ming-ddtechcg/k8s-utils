@@ -7,10 +7,14 @@ INFRA_HOME="${K8S_INFRA_HOME}/infra"
 UTILS_HOME="${K8S_INFRA_HOME}/utils"
 ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
 CNI_HOME="${ADD_ONS_HOME}/cni"
+FLANNEL_HOME="${CNI_HOME}/flannel"
+CNI_PLUGINS_HOME="${FLANNEL_HOME}/cni-plugins"
 
 EXECUTION_DIR=`dirname $0`
 
 PRG="$0"
+
+ARCH=""
 
 
 
@@ -36,10 +40,25 @@ updateEnvironmentDirectory()
             UTILS_HOME="${K8S_INFRA_HOME}/utils"
             ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
             CNI_HOME="${ADD_ONS_HOME}/cni"
+            FLANNEL_HOME="${CNI_HOME}/flannel"
+            CNI_PLUGINS_HOME="${FLANNEL_HOME}/cni-plugins"
             break
         fi
 
         CURRENT_PWD=`dirname ${CURRENT_PWD}`
+    done
+}
+
+
+
+#
+# flannel cni-plugins downloads
+#
+downloadFlannelCniPlugins()
+{
+    for arch in arm64 amd64
+    do
+        curl -O -L -s https://github.com/containernetworking/plugins/releases/download/v1.7.1/cni-plugins-linux-$arch-v1.7.1.tgz
     done
 }
 
@@ -51,39 +70,11 @@ updateEnvironmentDirectory()
 
 updateEnvironmentDirectory
 
-. ${UTILS_HOME}/questionutils.sh ""
+ARCH="$1"
 
-while true
-do
-    echo ""
-    echo "Select one of the following Container Network Interface (CNI)"
-    echo "============================================================="
-    echo "1. calico"
-    echo "2. cilium"
-    echo "8. flannel"
-    echo ""
-    echo "9. return"
-    echo ""
-    questionAndResponse "select (1/2/8/9)" "1 2 8 9"
-
-    case ${ANSWER_REQUESTION_RESPONSE} in
-    '1')
-        ${CNI_HOME}/calico/calico_install.sh
-        continue
-        ;;
-    '2')
-        ${CNI_HOME}/cilium/cilium_install.sh
-        continue
-        ;;
-    '8')
-        ${CNI_HOME}/flannel/flannel_install.sh
-        continue
-        ;;
-    '9')
-        break
-        ;;
-    esac
-done
+curl -L -s \
+    https://github.com/ming-ddtechcg/k8s-utils/releases/download/flannel-v1.7.1/cni-plugins-linux-${ARCH}-v1.7.1.tgz  \
+    -o ${CNI_PLUGINS_HOME}/cni-plugins-linux-${ARCH}-v1.7.1.tgz
 
 exit 0
 

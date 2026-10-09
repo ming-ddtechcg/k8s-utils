@@ -7,10 +7,14 @@ INFRA_HOME="${K8S_INFRA_HOME}/infra"
 UTILS_HOME="${K8S_INFRA_HOME}/utils"
 ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
 CNI_HOME="${ADD_ONS_HOME}/cni"
+FLANNEL_HOME="${CNI_HOME}/flannel"
+CNI_PLUGINS_HOME="${FLANNEL_HOME}/cni-plugins"
 
 EXECUTION_DIR=`dirname $0`
 
 PRG="$0"
+
+ARCH=""
 
 
 
@@ -36,6 +40,8 @@ updateEnvironmentDirectory()
             UTILS_HOME="${K8S_INFRA_HOME}/utils"
             ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
             CNI_HOME="${ADD_ONS_HOME}/cni"
+            FLANNEL_HOME="${CNI_HOME}/flannel"
+            CNI_PLUGINS_HOME="${FLANNEL_HOME}/cni-plugins"
             break
         fi
 
@@ -51,39 +57,42 @@ updateEnvironmentDirectory()
 
 updateEnvironmentDirectory
 
-. ${UTILS_HOME}/questionutils.sh ""
+ARCH=$(uname -m)
 
-while true
-do
-    echo ""
-    echo "Select one of the following Container Network Interface (CNI)"
-    echo "============================================================="
-    echo "1. calico"
-    echo "2. cilium"
-    echo "8. flannel"
-    echo ""
-    echo "9. return"
-    echo ""
-    questionAndResponse "select (1/2/8/9)" "1 2 8 9"
+CNI_PLUGINS_HOME="${FLANNEL_HOME}/cni-plugins"
 
-    case ${ANSWER_REQUESTION_RESPONSE} in
-    '1')
-        ${CNI_HOME}/calico/calico_install.sh
-        continue
-        ;;
-    '2')
-        ${CNI_HOME}/cilium/cilium_install.sh
-        continue
-        ;;
-    '8')
-        ${CNI_HOME}/flannel/flannel_install.sh
-        continue
-        ;;
-    '9')
-        break
-        ;;
-    esac
-done
+case $ARCH in
+armv7*)
+    exit 0
+    ;;
+aarch64) 
+    ARCH="arm64"
+    ;;
+x86_64)
+    ARCH="amd64"
+    ;;
+esac
+
+if [ ! -d "/opt/cni/bin" ]
+then
+    sudo mkdir -p /opt/cni/bin
+else
+    CURRENT_TIME=`date '+%Y%m%d%H%M%S'`
+    sudo mv /opt/cni/bin /opt/cni/bin_${CURRENT_TIME}
+    sudo mkdir -p /opt/cni/bin
+fi
+
+CNI_PLUGINS_FILE="${CNI_PLUGINS_HOME}/cni-plugins-linux-$ARCH-v1.7.1.tgz"
+
+if [ ! -f "${CNI_PLUGINS_FILE}" ]
+then
+    ${CNI_PLUGINS_HOME}/flannel_cni_plugin_downloads.sh "${ARCH}"
+fi
+
+if [ -f "${CNI_PLUGINS_HOME}/cni-plugins-linux-$ARCH-v1.7.1.tgz" ]
+then
+    sudo tar -C /opt/cni/bin -xzf ${CNI_PLUGINS_HOME}/cni-plugins-linux-$ARCH-v1.7.1.tgz
+fi
 
 exit 0
 
