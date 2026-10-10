@@ -1,16 +1,21 @@
 #!/bin/sh
 
+#!/bin/sh
+
 K8S_INFRA_HOME=""
 BIN_HOME="${K8S_INFRA_HOME}/bin"
 ETC_HOME="${K8S_INFRA_HOME}/etc"
 INFRA_HOME="${K8S_INFRA_HOME}/infra"
 UTILS_HOME="${K8S_INFRA_HOME}/utils"
 ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
-CNI_HOME="${ADD_ONS_HOME}/cni"
+VISUAL_AND_CONTROL_HOME="${ADD_ONS_HOME}/visual-and-control"
+DASHBOARD_HOME="${VISUAL_AND_CONTROL_HOME}/dashboard"
 
 EXECUTION_DIR=`dirname $0`
 
 PRG="$0"
+
+NAMESPACE="kubernetes-dashboard"
 
 
 
@@ -35,7 +40,8 @@ updateEnvironmentDirectory()
             INFRA_HOME="${K8S_INFRA_HOME}/infra"
             UTILS_HOME="${K8S_INFRA_HOME}/utils"
             ADD_ONS_HOME="${K8S_INFRA_HOME}/add-ons"
-            CNI_HOME="${ADD_ONS_HOME}/cni"
+            VISUAL_AND_CONTROL_HOME="${ADD_ONS_HOME}/visual-and-control"
+            DASHBOARD_HOME="${VISUAL_AND_CONTROL_HOME}/dashboard"
             break
         fi
 
@@ -43,53 +49,37 @@ updateEnvironmentDirectory()
     done
 }
 
-
+ 
 
 #
-# starts from here
+# start from here
 #
 
 updateEnvironmentDirectory
 
 . ${UTILS_HOME}/questionutils.sh ""
 
-while true
-do
-    echo ""
-    echo "Select one of the following Container Network Interface (CNI)"
-    echo "============================================================="
-    echo "1. calico"
-    echo "2. cilium"
-    echo "3. multus"
-    echo ""
-    echo "8. flannel"
-    echo ""
-    echo "9. return"
-    echo ""
-    questionAndResponse "select (1/2/3/8/9)" "1 2 3 8 9"
+questionAndResponse "Ensure KUBECONFIG has been set. Press enter to continue or Control-C to exit" "skip"
 
-    case ${ANSWER_REQUESTION_RESPONSE} in
-    '1')
-        ${CNI_HOME}/calico/calico_install.sh
-        continue
-        ;;
-    '2')
-        ${CNI_HOME}/cilium/cilium_install.sh
-        continue
-        ;;
-    '3')
-        ${CNI_HOME}/multus/multus_install.sh
-        continue
-        ;;
-    '8')
-        ${CNI_HOME}/flannel/flannel_install.sh
-        continue
-        ;;
-    '9')
-        break
-        ;;
-    esac
-done
+SECRET_NAME=`kubectl get secrets -n ${NAMESPACE} -o json \
+    | jq -r '.items[] | select( .metadata.annotations != null and .metadata.annotations."secret-type" != null and .metadata.annotations."secret-type" == "token" ) | .metadata.name'`
 
+if [ "${SECRET_NAME}" != "" ]
+then
+    echo ""
+    echo "token:"
+    echo ""
+
+    kubectl get secret/${SECRET_NAME} -n ${NAMESPACE} -o jsonpath='{.data.token}' | base64 -d
+else
+    echo ""
+    echo "ERROR: unable to locate the token secret, abort"
+    echo ""
+
+    exit 1
+fi
+
+echo ""
+ 
 exit 0
 
