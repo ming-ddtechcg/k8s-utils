@@ -6,7 +6,7 @@ NFS external provisioner
 ```bash
 helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner-4.0.18.tgz \
     -n <namespace> \
-    --set image.repository=harbor.ddtechcg.com/sig-storage/nfs-subdir-external-provisioner \
+    --set image.repository=harbor.ddtechcg.com:5001/sig-storage/nfs-subdir-external-provisioner \
     --set image.tag=v4.0.2 \
     --set nfs.server=x.x.x.x \
     --set nfs.path=/exported/path \
@@ -25,7 +25,7 @@ example:
 ```bash
 helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner-4.0.18.tgz \
     -n kube-system \
-    --set image.repository=harbor.ddtechcg.com/sig-storage/nfs-subdir-external-provisioner \
+    --set image.repository=harbor.ddtechcg.com:5001/sig-storage/nfs-subdir-external-provisioner \
     --set image.tag=v4.0.2 \
     --set nfs.server=192.168.20.11 \
     --set nfs.path=/export/share/nfs/k8s/test/ubuntu-2204 \
