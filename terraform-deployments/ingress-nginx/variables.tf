@@ -58,19 +58,13 @@ variable "service_components_controller" {
   default     = "controller"
 }
 
+variable "admission_name" {
+  type        = string
+  description = "nginx webhook admission name"
+  default     = "ingress-nginx-admission"
+}
+
 # ---
-
-variable "service_facing_port" {
-  type        = number
-  description = "service facing port number"
-  default     = 8080
-}
-
-variable "pod_replica_number" {
-  type        = number
-  description = "pod replica number"
-  default     = 1
-}
 
 variable "container_image" {
   type        = string
