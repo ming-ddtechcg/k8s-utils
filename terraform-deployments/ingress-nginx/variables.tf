@@ -60,14 +60,66 @@ variable "service_components_controller" {
 
 variable "admission_name" {
   type        = string
-  description = "nginx webhook admission name"
+  description = "nginx validating webhook admission name"
   default     = "ingress-nginx-admission"
 }
 
-# ---
-
-variable "container_image" {
+variable "service_name" {
   type        = string
-  description = "container image"
-  default     = "harbor.ddtechcg.com:5001/k8s-utils/ingress-nginx-controller:v1.11.2"
+  description = "nginx service name"
+  default     = "nginx"
+}
+
+variable "default_http_backend_name" {
+  type        = string
+  description = "default http backend name"
+  default     = "default-http-backend"
+}
+
+variable "default_http_backend_port" {
+  type        = number
+  description = "default http backend port"
+  default     = 80
+}
+
+variable "default_http_backend_target_port" {
+  type        = number
+  description = "default http backend target port"
+  default     = 8080
+}
+
+variable "default_http_backend_replicas" {
+  type        = number
+  description = "default http backend replicas"
+  default     = 1
+}
+
+variable "default_http_backend_container_image" {
+  type        = string
+  description = "default http backend container image"
+  default     = "harbor.ddtechcg.com:5001/k8s-utils/defaultbackend-amd64:1.5"
+}
+
+variable "default_http_backend_resource_limits_cpu" {
+  type        = string
+  description = "default http backend resoures limits cpu"
+  default     = "10m"
+}
+
+variable "default_http_backend_resource_limits_memory" {
+  type        = string
+  description = "default http backend resoures limits memory"
+  default     = "20Mi"
+}
+
+variable "default_http_backend_resource_requests_cpu" {
+  type        = string
+  description = "default http backend resoures requests cpu"
+  default     = "10m"
+}
+
+variable "default_http_backend_resource_requests_memory" {
+  type        = string
+  description = "default http backend resoures requests memory"
+  default     = "20Mi"
 }
