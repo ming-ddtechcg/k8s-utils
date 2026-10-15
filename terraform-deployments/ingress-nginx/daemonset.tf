@@ -160,14 +160,6 @@ resource "kubernetes_daemon_set_v1" "this" {
             secret_name = var.admission_name
           }
         }
-        toleration {
-          key    = "node-role.kubernetes.io/control-plane"
-          effect = "NoSchedule"
-        }
-        toleration {
-          key    = "node-role.kubernetes.io/master"
-          effect = "NoSchedule"
-        }
       }
     }
   }

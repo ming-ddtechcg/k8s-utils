@@ -100,6 +100,18 @@ variable "admission_name" {
   default     = "ingress-nginx-admission"
 }
 
+variable "admission_create_name" {
+  type        = string
+  description = "nginx admission create job name"
+  default     = "ingress-nginx-admission-create"
+}
+
+variable "admission_create_image" {
+  type        = string
+  description = "nginx admission create container image"
+  default     = "harbor.ddtechcg.com:5001/k8s-utils/kube-webhook-certgen:v1.4.3"
+}
+
 variable "admission_patch_name" {
   type        = string
   description = "nginx admission patch job name"
