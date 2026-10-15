@@ -12,7 +12,7 @@ Kubernetes utilities and documents
 ├── platform-modules
 │   ├── helm-charts
 │   └── terraforms
-├── k8s-tests    (the test tools about k8s)
+├── k8s-tests    (the test tools about k8s or the platform modules)
 └── developments (any development related to k8s)
 ```
 
