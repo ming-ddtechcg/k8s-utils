@@ -9,7 +9,9 @@ Kubernetes utilities and documents
 │   ├── clouds
 │   └── on-premises
 ├── docs
-├── helm-charts
+├── platform-modules
+│   ├── helm-charts
+│   └── terraforms
 ├── k8s-tests    (the test tools about k8s)
 └── developments (any development related to k8s)
 ```
