@@ -82,6 +82,12 @@ variable "controller_resource_requests_memory" {
   default     = "90Mi"
 }
 
+variable "service_name" {
+  type        = string
+  description = "nginx service name"
+  default     = "nginx"
+}
+
 variable "service_components_controller" {
   type        = string
   description = "nginx service compnents controller"
@@ -94,11 +100,19 @@ variable "admission_name" {
   default     = "ingress-nginx-admission"
 }
 
-variable "service_name" {
+variable "admission_patch_name" {
   type        = string
-  description = "nginx service name"
-  default     = "nginx"
+  description = "nginx admission patch job name"
+  default     = "ingress-nginx-admission-patch"
 }
+
+variable "admission_patch_image" {
+  type        = string
+  description = "nginx admission patch container image"
+  default     = "harbor.ddtechcg.com:5001/k8s-utils/kube-webhook-certgen:v1.4.3"
+}
+
+# ---
 
 variable "default_http_backend_name" {
   type        = string
