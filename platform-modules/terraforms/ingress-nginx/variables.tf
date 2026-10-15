@@ -27,7 +27,7 @@ variable "kubernetes_config_context" {
 
 # variable "cluster_ca_certificate" {
 #   type        = string
-#   description = "Kubernetes api-server client CA certification"
+#   description = "Kubernetes cluster CA certification"
 # }
 
 variable "namespace" {

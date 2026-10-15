@@ -58,7 +58,7 @@ variable "client_key" {
 
 variable "cluster_ca_certificate" {
   type        = string
-  description = "Kubernetes api-server client CA certification"
+  description = "Kubernetes cluster CA certification"
 }
 ```
 
