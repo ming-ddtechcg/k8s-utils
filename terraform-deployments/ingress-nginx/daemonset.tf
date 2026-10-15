@@ -11,8 +11,8 @@ resource "kubernetes_daemon_set_v1" "this" {
     namespace = var.namespace
   }
   spec {
-    min_min_ready_seconds     = 0
-    revrevision_history_limit = 10
+    min_ready_seconds      = 0
+    revision_history_limit = 10
     selector {
       match_labels = {
         "app.kubernetes.io/component" = var.service_components_controller
@@ -48,23 +48,23 @@ resource "kubernetes_daemon_set_v1" "this" {
             "- --publish-service=$(POD_NAMESPACE)/${var.controller_name}"
           ]
           env {
-            name = POD_NAME
+            name = "POD_NAME"
             value_from {
               field_ref {
-                field_path = metadata.name
+                field_path = "metadata.name"
               }
             }
           }
           env {
-            name = POD_NAMESPACE
+            name = "POD_NAMESPACE"
             value_from {
               field_ref {
-                field_path = metadata.namespace
+                field_path = "metadata.namespace"
               }
             }
           }
           env {
-            name  = LD_PRELOAD
+            name  = "LD_PRELOAD"
             value = "/usr/local/lib/libmimalloc.so"
           }
           image             = var.controller_image

@@ -18,22 +18,20 @@ resource "kubernetes_service_v1" "this" {
     }
     ip_families      = ["IPv4"]
     ip_family_policy = "SingleStack"
-
     port {
       app_protocol = "http"
       name         = var.controller_http_port_name
       port         = var.controller_http_port
       target_port  = var.controller_http_port
-      protocol     = TCP
+      protocol     = "TCP"
     }
     port {
       app_protocol = "https"
       name         = var.controller_https_port_name
       port         = var.controller_https_port
       target_port  = var.controller_https_port
-      protocol     = TCP
+      protocol     = "TCP"
     }
-
     type = "ClusterIP"
   }
 }

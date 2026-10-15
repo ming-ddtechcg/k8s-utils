@@ -9,7 +9,6 @@ resource "kubernetes_ingress_class_v1" "this" {
       "app.kubernetes.io/version"   = var.service_version
     }
   }
-
   spec {
     controller = "k8s.io/${var.controller_name}"
   }

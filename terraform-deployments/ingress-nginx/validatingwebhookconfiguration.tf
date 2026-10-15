@@ -9,10 +9,8 @@ resource "kubernetes_validating_webhook_configuration_v1" "this" {
       "app.kubernetes.io/version"   = var.service_version
     }
   }
-
   webhook {
     admission_review_versions = ["v1"]
-
     client_config {
       service {
         namespace = var.namespace
@@ -23,7 +21,6 @@ resource "kubernetes_validating_webhook_configuration_v1" "this" {
     failure_policy = "Fail"
     match_policy   = "Equivalent"
     name           = "validate.nginx.ingress.kubernetes.io"
-
     rule {
       api_groups   = ["networking.k8s.io"]
       api_versions = ["v1"]

@@ -10,7 +10,6 @@ resource "kubernetes_role_v1" "this" {
     }
     namespace = var.namespace
   }
-
   rule {
     api_groups = [""]
     resources  = ["namespaces"]

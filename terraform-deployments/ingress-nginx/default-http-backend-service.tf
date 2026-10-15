@@ -13,9 +13,8 @@ resource "kubernetes_service_v1" "default_http_backend" {
     port {
       port        = var.default_http_backend_port
       target_port = var.default_http_backend_target_port
-      protocol    = TCP
+      protocol    = "TCP"
     }
-
     type = "ClusterIP"
   }
 }

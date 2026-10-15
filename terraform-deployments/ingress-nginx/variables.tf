@@ -1,13 +1,13 @@
 variable "kubernetes_config_file" {
   type        = string
   description = "Kubernetes config path and file"
-  # default     = "~/.kube/config.kubee-ubuntu-2204"
+  default     = "~/.kube/config.kubee-ubuntu-2204"
 }
 
 variable "kubernetes_config_context" {
   type        = string
   description = "Kubernetes config context"
-  # default     = "kubernetes-admin@kubernetes"
+  default     = "kubernetes-admin@kubernetes"
 }
 
 variable "namespace" {
