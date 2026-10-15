@@ -1,4 +1,4 @@
-resource "kubernetes_validating_webhook_configuration_v1" "this" {
+resource "kubernetes_validating_webhook_configuration_v1" "validating_webhook_configuration" {
   metadata {
     name = var.admission_name
     labels = {

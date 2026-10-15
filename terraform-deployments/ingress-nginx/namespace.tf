@@ -1,4 +1,4 @@
-resource "kubernetes_namespace_v1" "test" {
+resource "kubernetes_namespace_v1" "ingress_nginx" {
   metadata {
     name = var.namespace
     labels = {

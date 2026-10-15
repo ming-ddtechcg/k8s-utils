@@ -1,4 +1,4 @@
-resource "kubernetes_config_map_v1" "this" {
+resource "kubernetes_config_map_v1" "ingress_nginx" {
   metadata {
     name = var.controller_name
     labels = {

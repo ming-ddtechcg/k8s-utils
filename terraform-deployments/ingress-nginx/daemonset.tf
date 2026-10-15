@@ -1,4 +1,4 @@
-resource "kubernetes_daemon_set_v1" "this" {
+resource "kubernetes_daemon_set_v1" "ingress_nginx" {
   metadata {
     name = var.controller_name
     labels = {
@@ -34,18 +34,18 @@ resource "kubernetes_daemon_set_v1" "this" {
         host_network = true
         container {
           args = [
-            "- /nginx-ingress-controller",
-            "- --default-backend-service=$(POD_NAMESPACE)/${var.default_http_backend_name}",
-            "- --election-id=ingress-nginx-leader",
-            "- --controller-class=k8s.io/${var.controller_name}",
-            "- --ingress-class=nginx",
-            "- --configmap=$(POD_NAMESPACE)/${var.controller_name}",
-            "- --validating-webhook=${var.controller_webhook_port}",
-            "- --validating-webhook-certificate=/usr/local/certificates/cert",
-            "- --validating-webhook-key=/usr/local/certificates/key",
-            "- --enable-metrics=false",
-            "- --annotations-prefix=nginx.ingress.kubernetes.io",
-            "- --publish-service=$(POD_NAMESPACE)/${var.controller_name}"
+            "/nginx-ingress-controller",
+            "--default-backend-service=$(POD_NAMESPACE)/${var.default_http_backend_name}",
+            "--election-id=ingress-nginx-leader",
+            "--controller-class=k8s.io/${var.controller_name}",
+            "--ingress-class=nginx",
+            "--configmap=$(POD_NAMESPACE)/${var.controller_name}",
+            "--validating-webhook=${var.controller_webhook_port}",
+            "--validating-webhook-certificate=/usr/local/certificates/cert",
+            "--validating-webhook-key=/usr/local/certificates/key",
+            "--enable-metrics=false",
+            "--annotations-prefix=nginx.ingress.kubernetes.io",
+            "--publish-service=$(POD_NAMESPACE)/${var.controller_name}"
           ]
           env {
             name = "POD_NAME"
@@ -73,7 +73,7 @@ resource "kubernetes_daemon_set_v1" "this" {
             pre_stop {
               exec {
                 command = [
-                  "- /wait-shutdown"
+                  "/wait-shutdown"
                 ]
               }
             }
@@ -128,10 +128,10 @@ resource "kubernetes_daemon_set_v1" "this" {
             allow_privilege_escalation = true
             capabilities {
               add = [
-                "- NET_BIND_SERVICE"
+                "NET_BIND_SERVICE"
               ]
               drop = [
-                "- ALL"
+                "ALL"
               ]
             }
             read_only_root_filesystem = false
@@ -147,7 +147,6 @@ resource "kubernetes_daemon_set_v1" "this" {
             read_only  = true
           }
         }
-
         dns_policy = "ClusterFirst"
         node_selector = {
           "kubernetes.io/os" = "linux"

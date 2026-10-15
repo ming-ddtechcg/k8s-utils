@@ -25,12 +25,12 @@ resource "kubernetes_job_v1" "admission_patch_job" {
       spec {
         container {
           args = [
-            "- patch",
-            "- --webhook-name=${var.admission_name}",
+            "patch",
+            "--webhook-name=${var.admission_name}",
             "--namespace=$(POD_NAMESPACE)",
-            "- --patch-mutating=false",
-            "- --secret-name=${var.admission_name}",
-            "- --patch-failure-policy=Fail"
+            "--patch-mutating=false",
+            "--secret-name=${var.admission_name}",
+            "--patch-failure-policy=Fail"
           ]
           env {
             name = "POD_NAMESPACE"
@@ -47,7 +47,7 @@ resource "kubernetes_job_v1" "admission_patch_job" {
             allow_privilege_escalation = false
             capabilities {
               drop = [
-                "- ALL"
+                "ALL"
               ]
             }
             read_only_root_filesystem = true
@@ -65,7 +65,5 @@ resource "kubernetes_job_v1" "admission_patch_job" {
         service_account_name = var.admission_name
       }
     }
-    backoff_limit = 4
   }
-  wait_for_completion = false
 }

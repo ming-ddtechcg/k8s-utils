@@ -1,4 +1,4 @@
-resource "kubernetes_service_account_v1" "this" {
+resource "kubernetes_service_account_v1" "ingress_nginx" {
   automount_service_account_token = true
   metadata {
     name = var.controller_name

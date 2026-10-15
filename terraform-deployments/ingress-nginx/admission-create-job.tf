@@ -25,10 +25,10 @@ resource "kubernetes_job_v1" "admission_create_job" {
       spec {
         container {
           args = [
-            "- create",
-            "- --host=${var.admission_name},${var.admission_name}.$(POD_NAMESPACE).svc",
+            "create",
+            "--host=${var.admission_name},${var.admission_name}.$(POD_NAMESPACE).svc",
             "--namespace=$(POD_NAMESPACE)",
-            "- --secret-name=${var.admission_name}"
+            "--secret-name=${var.admission_name}"
           ]
           env {
             name = "POD_NAMESPACE"
@@ -45,7 +45,7 @@ resource "kubernetes_job_v1" "admission_create_job" {
             allow_privilege_escalation = false
             capabilities {
               drop = [
-                "- ALL"
+                "ALL"
               ]
             }
             read_only_root_filesystem = true

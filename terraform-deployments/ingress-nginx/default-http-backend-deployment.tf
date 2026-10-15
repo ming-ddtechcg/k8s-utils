@@ -24,7 +24,7 @@ resource "kubernetes_deployment_v1" "default_http_backend" {
           image = var.default_http_backend_image
           name  = var.default_http_backend_name
           port {
-            container_port = var.default_http_backend_port
+            container_port = var.default_http_backend_target_port
             protocol       = "TCP"
           }
           resources {
@@ -40,7 +40,7 @@ resource "kubernetes_deployment_v1" "default_http_backend" {
           liveness_probe {
             http_get {
               path   = "/healthz"
-              port   = var.default_http_backend_port
+              port   = var.default_http_backend_target_port
               scheme = "HTTP"
             }
             initial_delay_seconds = 30
