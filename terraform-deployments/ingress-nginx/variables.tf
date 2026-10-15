@@ -40,7 +40,7 @@ variable "controller_http_port" {
   default     = 80
 }
 
-variable "controller_http_ports_name" {
+variable "controller_https_port_name" {
   type        = string
   description = "nginx controller HTTPs port name"
   default     = "https"
@@ -50,6 +50,36 @@ variable "controller_https_port" {
   type        = number
   description = "nginx controller HTTP ports"
   default     = 443
+}
+
+variable "controller_webhook_port_name" {
+  type        = string
+  description = "nginx controller webhook port name"
+  default     = "webhook"
+}
+
+variable "controller_webhook_port" {
+  type        = number
+  description = "nginx controller webhook ports"
+  default     = 8443
+}
+
+variable "controller_image" {
+  type        = string
+  description = "nginx controller container image"
+  default     = "harbor.ddtechcg.com:5001/k8s-utils/ingress-nginx-controller:v1.11.2"
+}
+
+variable "controller_resource_requests_cpu" {
+  type        = string
+  description = "nginx controller resoures requests cpu"
+  default     = "100m"
+}
+
+variable "controller_resource_requests_memory" {
+  type        = string
+  description = "nginx controller resoures requests memory"
+  default     = "90Mi"
 }
 
 variable "service_components_controller" {
@@ -94,7 +124,7 @@ variable "default_http_backend_replicas" {
   default     = 1
 }
 
-variable "default_http_backend_container_image" {
+variable "default_http_backend_image" {
   type        = string
   description = "default http backend container image"
   default     = "harbor.ddtechcg.com:5001/k8s-utils/defaultbackend-amd64:1.5"

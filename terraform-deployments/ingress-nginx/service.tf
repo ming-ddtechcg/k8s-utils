@@ -28,7 +28,7 @@ resource "kubernetes_service_v1" "this" {
     }
     port {
       app_protocol = "https"
-      name         = var.controller_http_ports_name
+      name         = var.controller_https_port_name
       port         = var.controller_https_port
       target_port  = var.controller_https_port
       protocol     = TCP
