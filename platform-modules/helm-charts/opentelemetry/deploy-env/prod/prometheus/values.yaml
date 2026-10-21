@@ -32,9 +32,44 @@ prometheus:
     port: "9090"
   config:
     db_retention_time: 15d
-    web_route_prefix: prometheus-mlops
-    web_external_url: prometheus-mlops
+    db_storage:
+      #
+      # to use the external storage
+      #
+      # format:
+      # true | false
+      #
+      use_external: false
+      db_name: prometheus-db
+      storageclass: nfs-client
+      accessmodes: [ "ReadWriteMany" ]
+      storage_size: 5Gi
+    #
+    # Prefix for the internal routes of web endpoints. 
+    #
+    # Notes:
+    # 1. defaults to path of --web.external-url.
+    # 2. an empty for no setting.
+    #
+    web_route_prefix:
+    #
+    # The URL under which Prometheus is externally reachable (for example,
+    # if Prometheus is served via a reverse proxy). Used for generating relative
+    # and absolute links back to Prometheus itself. If the URL has a path portion,
+    # it will be used to prefix all HTTP endpoints served by Prometheus. If omitted,
+    # relevant URL components will be derived automatically
+    # 
+    # Notes:
+    # 1. an empty for no setting.
+    #
+    web_external_url:
     ingress:
+      #
+      # ingress enable
+      #
+      # format:
+      # true | false
+      #
       enabled: false
       host:
       path: /

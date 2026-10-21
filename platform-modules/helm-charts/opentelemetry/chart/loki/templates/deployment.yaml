@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.loki.name }}
+  labels:
+    app: {{ .Values.loki.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.loki.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.loki.name }}
+      annotations:
+        checksum/cofnig-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
+    spec:
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist 
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.loki.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.loki.name }}
+      containers:
+      - name: {{ .Values.loki.name }}
+        image: {{ .Values.loki.image }}
+        args:
+          - -config.file=/etc/loki/loki-config.yaml
+          - -target=all
+        ports:
+        - containerPort: {{ .Values.loki.ports.port }}
+          name: {{ .Values.loki.ports.port_name }}
+        resources:
+          limits:
+            cpu: {{ .Values.loki.resources.limits.cpu }}
+            memory: {{ .Values.loki.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.loki.resources.requests.cpu }}
+            memory: {{ .Values.loki.resources.requests.memory }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/loki
+          readOnly: true
+        - name: storage-volume
+          mountPath: /loki
+      serviceAccount: {{ .Values.loki.name }}
+      serviceAccountName: {{ .Values.loki.name }}
+      volumes:
+        - name: config-volume
+          configMap:
+            defaultMode: 420
+            name: {{ .Values.loki.name }}-config
+{{- if .Values.loki.config.db_storage.use_external }}
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.loki.config.db_storage.db_name }}
+{{- else }}
+        - name: storage-volume
+          emptyDir: {}
+{{- end }}
+
