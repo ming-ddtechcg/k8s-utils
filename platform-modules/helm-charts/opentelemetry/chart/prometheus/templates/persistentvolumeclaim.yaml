@@ -1,0 +1,19 @@
+{{- if .Values.prometheus.config.db_storage.use_external }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: {{ .Values.prometheus.name }}
+  name: {{ .Values.prometheus.config.db_storage.db_name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: {{ .Values.prometheus.config.db_storage.storageclass }}
+  accessModes:
+{{- range .Values.prometheus.config.db_storage.accessmodes }}
+    - {{ . }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.prometheus.config.db_storage.storage_size }}
+{{- end }}
+

@@ -113,6 +113,12 @@ spec:
           configMap:
             defaultMode: 420
             name: {{ .Values.prometheus.name }}-config
+{{- if .Values.prometheus.config.db_storage.use_external }}
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.prometheus.config.db_storage.db_name }}
+{{- else }}
         - name: storage-volume
           emptyDir: {}
+{{- end }}
 
