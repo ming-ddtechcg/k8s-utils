@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.prometheus.name }}
+  labels:
+    app: {{ .Values.prometheus.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.prometheus.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.prometheus.name }}
+    spec:
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist 
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.prometheus.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.prometheus.name }}
+      containers:
+      - name: {{ .Values.configmap_reload.name }}
+        image: {{ .Values.configmap_reload.image }}
+        imagePullPolicy: IfNotPresent
+        args:
+          - "--volume-dir=/etc/config"
+          - "--webhook-url=http://127.0.0.1:{{ .Values.prometheus.ports.port }}/{{ .Values.prometheus.config.web_route_prefix }}/-/reload"
+        resources:
+          limits:
+            cpu: {{ .Values.configmap_reload.resources.limits.cpu }}
+            memory: {{ .Values.configmap_reload.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.configmap_reload.resources.requests.cpu }}
+            memory: {{ .Values.configmap_reload.resources.requests.memory }}
+        volumeMounts:
+        - name: config-volume
+          readOnly: true
+          mountPath: /etc/config
+      - name: {{ .Values.prometheus.name }}
+        image: {{ .Values.prometheus.image }}
+        args:
+          - "--config.file=/etc/config/prometheus.yml"
+          - "--storage.tsdb.path=/data"
+          - "--enable-feature=expand-external-labels"
+          - "--storage.tsdb.retention.time={{ .Values.prometheus.config.db_retention_time }}"
+          - "--web.enable-lifecycle"
+{{- if .Values.prometheus.config.web_route_prefix }}
+          - "--web.route-prefix=/{{ .Values.prometheus.config.web_route_prefix }}"
+{{- end }}
+{{- if .Values.prometheus.config.web_external_url }}
+          - "--web.external-url=/{{ .Values.prometheus.config.web_external_url }}/"
+{{- end }}
+        ports:
+        - containerPort: {{ .Values.prometheus.ports.port }}
+          name: {{ .Values.prometheus.ports.port_name }}
+        resources:
+          limits:
+            cpu: {{ .Values.prometheus.resources.limits.cpu }}
+            memory: {{ .Values.prometheus.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.prometheus.resources.requests.cpu }}
+            memory: {{ .Values.prometheus.resources.requests.memory }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+          readOnly: true
+        - name: storage-volume
+          mountPath: /data
+      serviceAccount: {{ .Values.prometheus.name }}
+      serviceAccountName: {{ .Values.prometheus.name }}
+      volumes:
+        - name: config-volume
+          configMap:
+            defaultMode: 420
+            name: {{ .Values.prometheus.name }}-config
+        - name: storage-volume
+          emptyDir: {}
+

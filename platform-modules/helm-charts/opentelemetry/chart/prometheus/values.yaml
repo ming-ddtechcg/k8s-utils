@@ -1,0 +1,61 @@
+#
+# prometheus
+# 
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+prometheus:
+  name: prometheus
+  image: harbor.ddtechcg.com:5001/k8s-utils/prometheus:v3.13.5
+  resources:
+    limits:
+      cpu: 500m
+      memory: 8000Mi
+    requests:
+      cpu: 100m
+      memory: 1500Mi
+  ports:
+    port_name: metrics
+    port: "9090"
+  config:
+    db_retention_time: 15d
+    web_route_prefix: prometheus-mlops
+    web_external_url: prometheus-mlops
+    ingress:
+      enabled: false
+      host:
+      path: /
+      path_type: Prefix
+
+configmap_reload:
+  name: prometheus-configmap-reload
+  image: harbor.ddtechcg.com:5001/k8s-utils/configmap-reload:v0.9.0
+  resources:
+    limits:
+      cpu: 100m
+      memory: 500Mi
+    requests:
+      cpu: 20m
+      memory: 150Mi
+
+service_disocvery:
+  #
+  # The following is an add-on example of the Service Disconvery (SD):
+  #
+  # nvidia-gpu-node-exporter:
+  #  target: nvidia-gpu-node-exporter.nvidia.svc.cluster.local:19000
+  #
+
