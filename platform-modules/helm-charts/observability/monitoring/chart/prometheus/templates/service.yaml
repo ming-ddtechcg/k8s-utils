@@ -5,10 +5,12 @@ metadata:
   annotations:
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '{{ .Values.prometheus.ports.port }}'
+  labels:
+    app.kubernetes.io/name: {{ .Values.prometheus.name }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector: 
-    app: {{ .Values.prometheus.name }}
+    app.kubernetes.io/name: {{ .Values.prometheus.name }}
   type: ClusterIP  
   ports:
     - port: {{ .Values.prometheus.ports.port }}

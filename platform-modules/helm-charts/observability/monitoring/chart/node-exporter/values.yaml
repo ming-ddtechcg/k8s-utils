@@ -1,0 +1,34 @@
+#
+# node-exporter
+#
+service:
+  component: exporter
+  version: 1.12.1
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+exporter:
+  name: node-exporter
+  image: harbor.ddtechcg.com:5001/k8s-utils/node-exporter:v1.12.1
+  port: "9100"
+  port_name: metrics
+  resources:
+    limits:
+      cpu: 250m
+      memory: 180Mi
+    requests:
+      cpu: 102m
+      memory: 180Mi
+

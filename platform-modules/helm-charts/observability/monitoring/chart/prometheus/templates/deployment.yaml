@@ -3,17 +3,19 @@ kind: Deployment
 metadata:
   name: {{ .Values.prometheus.name }}
   labels:
-    app: {{ .Values.prometheus.name }}
+    app.kubernetes.io/name: {{ .Values.prometheus.name }}
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.prometheus.name }}
+      app.kubernetes.io/name: {{ .Values.prometheus.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.prometheus.name }}
+        app.kubernetes.io/name: {{ .Values.prometheus.name }}
+      annotations:
+        checksum/cofnig-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
     spec:
 {{- if .Values.service.nodeAffinity }}
       affinity:

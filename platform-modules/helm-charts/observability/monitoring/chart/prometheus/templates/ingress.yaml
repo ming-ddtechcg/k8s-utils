@@ -4,6 +4,8 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
+  labels:
+    app.kubernetes.io/name: {{ .Values.prometheus.name }}
   name: {{ .Values.prometheus.name }}
   namespace: {{ .Release.Namespace }}
 spec:

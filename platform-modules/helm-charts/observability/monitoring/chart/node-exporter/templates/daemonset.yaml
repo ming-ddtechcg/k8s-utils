@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ .Values.service.component }}
+    app.kubernetes.io/name: {{ .Values.exporter.name }}
+    app.kubernetes.io/version: {{ .Values.service.version }}
+  name: {{ .Values.exporter.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: {{ .Values.service.component }}
+      app.kubernetes.io/name: {{ .Values.exporter.name }}
+      app.kubernetes.io/version: {{ .Values.service.version }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: {{ .Values.service.component }}
+        app.kubernetes.io/name: {{ .Values.exporter.name }}
+        app.kubernetes.io/version: {{ .Values.service.version }}
+    spec:
+      containers:
+      - args:
+        - --path.procfs=/host/proc
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host/root
+        - --web.listen-address=:{{ .Values.exporter.port }}
+        - --collector.systemd
+        - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        - --collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$
+        - --collector.netdev.device-exclude=^(veth.*|[a-f0-9]{15})$
+        name: {{ .Values.exporter.name }}
+        image: {{ .Values.exporter.image }}
+        ports:
+          - containerPort: {{ .Values.exporter.port }}
+            name: {{ .Values.exporter.port_name }}
+            protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.exporter.resources.limits.cpu }}
+            memory: {{ .Values.exporter.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.exporter.resources.requests.cpu }}
+            memory: {{ .Values.exporter.resources.requests.memory }}
+        volumeMounts:
+        - mountPath: /host/sys
+          mountPropagation: HostToContainer
+          name: sys
+          readOnly: true
+        - mountPath: /host/root
+          mountPropagation: HostToContainer
+          name: root
+          readOnly: true
+        - mountPath: /host/proc
+          mountPropagation: HostToContainer
+          name: proc
+          readOnly: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      volumes:
+      - hostPath:
+          path: /sys
+        name: sys
+      - hostPath:
+          path: /
+        name: root
+      - hostPath:
+          path: /proc
+        name: proc
+

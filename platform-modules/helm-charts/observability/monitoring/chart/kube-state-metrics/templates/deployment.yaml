@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: {{ .Values.service.component }}
+    app.kubernetes.io/name: {{ .Values.exporter.name }}
+    app.kubernetes.io/version: {{ .Values.service.version }}
+  name: {{ .Values.exporter.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: {{ .Values.service.component }}
+      app.kubernetes.io/name: {{ .Values.exporter.name }}
+      app.kubernetes.io/version: {{ .Values.service.version }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: {{ .Values.service.component }}
+        app.kubernetes.io/name: {{ .Values.exporter.name }}
+        app.kubernetes.io/version: {{ .Values.service.version }}
+    spec:
+      automountServiceAccountToken: true
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist 
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.exporter.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.exporter.name }}
+      containers:
+      - image: {{ .Values.exporter.image }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: {{ .Values.exporter.ports.http_metrics_port }}
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: {{ .Values.exporter.name }}
+        ports:
+        - containerPort: {{ .Values.exporter.ports.http_metrics_port }}
+          name: {{ .Values.exporter.ports.http_metrics_port_name }}
+        - containerPort: {{ .Values.exporter.ports.telemetry_port }}
+          name: {{ .Values.exporter.ports.telemetry_port_name }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.exporter.ports.telemetry_port }}
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 65534
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccount: {{ .Values.exporter.name }}
+      serviceAccountName: {{ .Values.exporter.name }}
+

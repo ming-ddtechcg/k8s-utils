@@ -86,11 +86,3 @@ configmap_reload:
       cpu: 20m
       memory: 150Mi
 
-service_disocvery:
-  #
-  # The following is an add-on example of the Service Disconvery (SD):
-  #
-  # nvidia-gpu-node-exporter:
-  #  target: nvidia-gpu-node-exporter.nvidia.svc.cluster.local:19000
-  #
-

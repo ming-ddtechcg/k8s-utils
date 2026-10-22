@@ -1,0 +1,37 @@
+#
+# kube-state-metrics
+#
+service:
+  component: exporter
+  version: 2.20.0
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+exporter:
+  name: kube-state-metrics
+  image: harbor.ddtechcg.com:5001/k8s-utils/kube-state-metrics:v2.20.0
+  ports:
+    http_metrics_port: "8080"
+    http_metrics_port_name: http-metrics
+    telemetry_port: "8081"
+    telemetry_port_name: telemetry
+  resources:
+    limits:
+      cpu: 250m
+      memory: 300Mi
+    requests:
+      cpu: 100m
+      memory: 150Mi
+
