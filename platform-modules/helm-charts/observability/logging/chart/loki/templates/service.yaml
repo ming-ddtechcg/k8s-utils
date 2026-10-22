@@ -6,11 +6,11 @@ metadata:
     prometheus.io/scrape: 'true'
     prometheus.io/port:   '{{ .Values.loki.ports.port }}'
   labels:
-    app: {{ .Values.loki.name }}
+    app.kubernetes.io/name: {{ .Values.loki.name }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector: 
-    app: {{ .Values.loki.name }}
+    app.kubernetes.io/name: {{ .Values.loki.name }}
   type: ClusterIP  
   ports:
     - port: {{ .Values.loki.ports.port }}

@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: {{ .Values.loki.name }}
   labels:
-    app: {{ .Values.loki.name }}
+    app.kubernetes.io/name: {{ .Values.loki.name }}
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.loki.name }}
+      app.kubernetes.io/name: {{ .Values.loki.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.loki.name }}
+        app.kubernetes.io/name: {{ .Values.loki.name }}
       annotations:
-        checksum/cofnig-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
+        checksum/config-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
     spec:
 {{- if .Values.service.nodeAffinity }}
       affinity:

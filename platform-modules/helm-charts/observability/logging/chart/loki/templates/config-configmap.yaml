@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.loki.name }}-config
   labels:
-    app: {{ .Values.loki.name }}
+    app.kubernetes.io/name: {{ .Values.loki.name }}
   namespace: {{ .Release.Namespace }}
 data:
 {{ (.Files.Glob "config/*").AsConfig | indent 2  }}
