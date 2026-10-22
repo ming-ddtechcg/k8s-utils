@@ -15,7 +15,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Values.prometheus.name }}
       annotations:
-        checksum/cofnig-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
+        checksum/config-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
     spec:
 {{- if .Values.service.nodeAffinity }}
       affinity:
