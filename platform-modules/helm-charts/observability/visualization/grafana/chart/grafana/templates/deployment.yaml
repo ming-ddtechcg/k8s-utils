@@ -127,10 +127,6 @@ spec:
         - mountPath: /etc/grafana/grafana.ini
           name: grafana-ini
           subPath: grafana.ini
-{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
-        - mountPath: /var/lib/grafana/dashboards/{{ .Values.dashboard.custom_dashboard.directory_name }}
-          name: custom-dashboards
-{{- end }}
         - mountPath: /etc/grafana/provisioning/dashboards/
           name: grafana-provisioning-dashboards
         - mountPath: /etc/grafana/provisioning/datasources/
@@ -142,6 +138,12 @@ spec:
         - /bin/sh
         - -c
         - /bin/sh /usr/local/tmp/setup_grafana.sh
+        - name: EXECUTION
+          value: "init"
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
+        - name: EXTERNAL_DASHBOARD_DIRECTORY_NAME
+          value: {{ .Values.dashboard.custom_dashboard.directory_name }}
+{{- end }}
         image: {{ .Values.grafana.initworker.image }}
         imagePullPolicy: IfNotPresent
         name: {{ .Values.grafana.initworker.name }}
@@ -166,6 +168,10 @@ spec:
 {{- end }}
         - mountPath: /tmp/dest-dashboards
           name: grafana-provisioning-dashboards
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
+        - mountPath: /tmp/src-custom-dashboards
+          name: custom-dashboards
+{{- end }}
       - env:
         - name: METHOD
           value: LIST
@@ -246,7 +252,7 @@ spec:
 {{- if .Values.grafana.data_storage.use_external }}
       - name: grafana-data
         persistentVolumeClaim:
-          claimName: {{ .Values.grafana.data_storage.db_name }}
+          claimName: {{ .Values.grafana.data_storage.name }}
 {{- else }}
       - name: grafana-data
         emptyDir: {}

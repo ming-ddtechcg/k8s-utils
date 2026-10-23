@@ -1,4 +1,4 @@
-{{- if .Values.dashboard.load_custom_dashboards }}
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

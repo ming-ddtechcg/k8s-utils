@@ -42,7 +42,7 @@ grafana:
     name: grafana-setup
     image: harbor.ddtechcg.com:5001/k8s-utils/curl:7.70.0
   sidecar:
-    name: sra-aim-grafana-sc-datasources
+    name: grafana-sidecar
     image: harbor.ddtechcg.com:5001/k8s-utils/kiwigrid/k8s-sidecar:0.1.151
   service:
     port: "80"
@@ -54,7 +54,7 @@ grafana:
     # format:
     # true | false
     #
-    use_external: false
+    use_external: true
     name: grafana-data
     storageclass: nfs-client
     accessmodes: [ "ReadWriteMany" ]
@@ -66,6 +66,8 @@ grafana:
 
 datasource:
   #
+  # to load the default datasources come with this repo.
+  #
   # format:
   # true | false
   #
@@ -73,11 +75,19 @@ datasource:
 
 dashboard:
   #
+  # to load the default dashboard providers come with this repo.
+  #
   # format:
   # true | false
   #
-  enable_dashboards: false
+  # Note:
+  # 1. check the custom_dashboard option
+  # 2. check providers.yaml and related infor for the custom dashboard loading
+  #
+  enable_dashboards: true
   custom_dashboard:
+    #
+    # to load the dashboards come with this repo.
     #
     # format:
     # true | false
