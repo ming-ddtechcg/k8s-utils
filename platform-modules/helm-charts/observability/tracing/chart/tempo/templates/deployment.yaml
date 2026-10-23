@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.tempo.name }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.tempo.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.tempo.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.tempo.name }}
+      annotations:
+        checksum/config-cm: {{ include (print $.Template.BasePath "/config-configmap.yaml") . | sha256sum }}
+    spec:
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist 
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.tempo.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.tempo.name }}
+      containers:
+      - name: {{ .Values.tempo.name }}
+        image: {{ .Values.tempo.image }}
+        args:
+          - -config.file=/etc/tempo/tempo-config.yaml
+          - -target=all
+        ports:
+        - containerPort: {{ .Values.tempo.ports.port }}
+          name: {{ .Values.tempo.ports.port_name }}
+        resources:
+          limits:
+            cpu: {{ .Values.tempo.resources.limits.cpu }}
+            memory: {{ .Values.tempo.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.tempo.resources.requests.cpu }}
+            memory: {{ .Values.tempo.resources.requests.memory }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/tempo
+          readOnly: true
+        - name: storage-volume
+          mountPath: /var/tempo
+      serviceAccount: {{ .Values.tempo.name }}
+      serviceAccountName: {{ .Values.tempo.name }}
+      volumes:
+        - name: config-volume
+          configMap:
+            defaultMode: 420
+            name: {{ .Values.tempo.name }}-config
+{{- if .Values.tempo.config.db_storage.use_external }}
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.tempo.config.db_storage.db_name }}
+{{- else }}
+        - name: storage-volume
+          emptyDir: {}
+{{- end }}
+

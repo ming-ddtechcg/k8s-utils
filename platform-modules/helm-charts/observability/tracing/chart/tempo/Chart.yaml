@@ -1,0 +1,8 @@
+apiVersion: v2
+appVersion: "1.0"
+description: A Helm chart for observability/tracing
+home: https://github.com/ming-ddtechcg/k8s-utils.git
+name: tempo
+version: 0.0.1
+
+

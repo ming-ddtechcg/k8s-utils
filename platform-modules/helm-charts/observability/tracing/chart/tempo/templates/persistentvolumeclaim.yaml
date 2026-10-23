@@ -1,0 +1,19 @@
+{{- if .Values.tempo.config.db_storage.use_external }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.tempo.name }}
+  name: {{ .Values.tempo.config.db_storage.db_name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: {{ .Values.tempo.config.db_storage.storageclass }}
+  accessModes:
+{{- range .Values.tempo.config.db_storage.accessmodes }}
+    - {{ . }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.tempo.config.db_storage.storage_size }}
+{{- end }}
+

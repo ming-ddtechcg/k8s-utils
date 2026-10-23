@@ -1,0 +1,46 @@
+#
+# tempo
+# 
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+tempo:
+  name: tempo
+  image: harbor.ddtechcg.com:5001/k8s-utils/tempo:2.10.1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  ports:
+    port_name: metrics
+    port: "3200"
+  config:
+    db_storage:
+      #
+      # to use the external storage
+      #
+      # format:
+      # true | false
+      #
+      use_external: false
+      db_name: tempo-db
+      storageclass: nfs-client
+      accessmodes: [ "ReadWriteMany" ]
+      storage_size: 5Gi
+
