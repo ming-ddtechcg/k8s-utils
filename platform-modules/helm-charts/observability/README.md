@@ -5,6 +5,13 @@ Two categories under the observability and shown below:
 ```console
 .
 ├── logging
-└── monitoring
+│   └── loki
+├── monitoring
+│   ├── kube-state-metrics
+│   ├── node-exporter
+│   └── prometheus
+├── tracing
+│   └── tempo
+└── visualization
+    └── grafana
 ```
-
