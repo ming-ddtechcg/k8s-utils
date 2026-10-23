@@ -1,0 +1,18 @@
+{{- if .Values.grafana.data_storage.use_external }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.grafana.data_storage.name }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.data_storage.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  storageClassName: {{ .Values.grafana.data_storage.storageclass }}
+  accessModes:
+{{- range .Values.grafana.data_storage.accessmodes }}
+    - {{ . }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.grafana.data_storage.storage_size }}
+{{- end }}

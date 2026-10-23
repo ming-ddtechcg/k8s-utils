@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: "Folder Name"
+    allowUiUpdates: false
+    disableDeletion: true
+    editable: false
+    folder: "Folder Name"
+    options:
+      path: /var/lib/grafana/dashboards/folder_name
+    orgId: 1
+    type: file

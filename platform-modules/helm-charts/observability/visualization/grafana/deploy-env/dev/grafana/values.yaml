@@ -1,0 +1,87 @@
+#
+# grafana
+# 
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+grafana:
+  name: grafana
+  image: harbor.ddtechcg.com:5001/k8s-utils/grafana:12.3
+  admin_user: admin
+  admin_password: admin
+  replicas: 1
+  rolling_update:
+    max_surge: 25%
+    max_unavailable: 25%
+  ports:
+    grafana_port_name: grafana
+    grafana_port: "3000"
+    service_port_name: service
+    service_port: "80"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1000Mi
+    requests:
+      cpu: 250m
+      memory: 750Mi
+  initworker:
+    name: grafana-setup
+    image: harbor.ddtechcg.com:5001/k8s-utils/curl:7.70.0
+  sidecar:
+    name: grafana-sidecar
+    image: harbor.ddtechcg.com:5001/k8s-utils/kiwigrid/k8s-sidecar:0.1.151
+  service:
+    port: "80"
+    type: ClusterIP
+  data_storage:
+    #  
+    # to use the external storage
+    #
+    # format:
+    # true | false
+    #
+    use_external: false
+    name: grafana-data
+    storageclass: nfs-client
+    accessmodes: [ "ReadWriteMany" ]
+    storage_size: 5Gi
+  ingress:
+    enabled: false
+    host:
+    uri_path: grafana
+
+datasource:
+  #
+  # format:
+  # true | false
+  #
+  enable_datasources: true
+
+dashboard:
+  #
+  # format:
+  # true | false
+  #
+  enable_dashboards: false
+  custom_dashboard:
+    #
+    # format:
+    # true | false
+    #
+    load_dashboards: false
+    directory_name: test
+

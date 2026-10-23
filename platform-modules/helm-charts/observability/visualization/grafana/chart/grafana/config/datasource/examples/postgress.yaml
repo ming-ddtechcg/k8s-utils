@@ -1,0 +1,13 @@
+apiVersion: 1
+datasources:
+- access: proxy
+  name: postgres
+  type: postgres
+  user: postgress
+  jsonData:
+    database: ""
+    sslmode: disable
+  secureJsonData:
+    password: postgress
+  url: ""
+

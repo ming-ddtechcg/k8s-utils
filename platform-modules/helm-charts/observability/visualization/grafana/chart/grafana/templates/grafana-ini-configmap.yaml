@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}-ini
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "config/config/grafana.ini").AsConfig | indent 2  }}
+

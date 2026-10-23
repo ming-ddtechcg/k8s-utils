@@ -1,0 +1,254 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.grafana.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.grafana.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.grafana.rolling_update.max_surge }}
+      maxUnavailable: {{ .Values.grafana.rolling_update.max_unavailable }}
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/grafana-ini-cm: {{ include (print $.Template.BasePath "/grafana-ini-configmap.yaml") . | sha256sum }}
+        checksum/grafana-setup-cm: {{ include (print $.Template.BasePath "/grafana-setup-configmap.yaml") . | sha256sum }}
+        checksum/grafana-datasources-cm: {{ include (print $.Template.BasePath "/grafana-datasources-configmap.yaml") . | sha256sum }}
+        checksum/grafana-dashboards-cm: {{ include (print $.Template.BasePath "/grafana-dashboards-configmap.yaml") . | sha256sum }}
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
+        checksum/custom-dashboards-cm: {{ include (print $.Template.BasePath "/custom-dashboards-configmap.yaml") . | sha256sum }}
+{{- end }}
+      labels:
+        app.kubernetes.io/name: {{ .Values.grafana.name }} 
+    spec:
+{{- if .Values.service.nodeAffinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+{{- if .Values.service.nodeAffinity.key }}
+{{- if eq .Values.service.nodeAffinity.value "enabled" }}
+              - key: {{ .Values.service.nodeAffinity.key }}
+                operator: In
+                values:
+                - {{ .Values.service.nodeAffinity.value }}
+{{- else }}
+              - key: no-node-label
+                operator: In
+                values:
+                - DoesNotExist
+{{- end }}
+{{- else }}
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist
+{{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Values.grafana.name }}
+              topologyKey: kubernetes.io/hostname
+{{- end }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ .Values.grafana.name }}
+      containers:
+      - env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: admin-user
+              name: {{ .Values.grafana.name }}
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: admin-password
+              name: {{ .Values.grafana.name }}
+        image: {{ .Values.grafana.image }}
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /api/health
+            port: {{ .Values.grafana.ports.grafana_port }}
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30
+        name: {{ .Values.grafana.name }}
+        ports:
+        - containerPort: {{ .Values.grafana.ports.service_port }}
+          name: {{ .Values.grafana.ports.service_port_name }}
+          protocol: TCP
+        - containerPort: {{ .Values.grafana.ports.grafana_port }}
+          name: {{ .Values.grafana.ports.grafana_port_name }}
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/health
+            port: {{ .Values.grafana.ports.grafana_port }}
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: {{ .Values.grafana.resources.limits.cpu }}
+            memory: {{ .Values.grafana.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.grafana.resources.requests.cpu }}
+            memory: {{ .Values.grafana.resources.requests.memory }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/grafana/grafana.ini
+          name: grafana-ini
+          subPath: grafana.ini
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
+        - mountPath: /var/lib/grafana/dashboards/{{ .Values.dashboard.custom_dashboard.directory_name }}
+          name: custom-dashboards
+{{- end }}
+        - mountPath: /etc/grafana/provisioning/dashboards/
+          name: grafana-provisioning-dashboards
+        - mountPath: /etc/grafana/provisioning/datasources/
+          name: grafana-provisioning-datasources
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - /bin/sh /usr/local/tmp/setup_grafana.sh
+        image: {{ .Values.grafana.initworker.image }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.grafana.initworker.name }}
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/local/tmp/setup_grafana.sh
+          name: grafana-setup
+          subPath: setup_grafana.sh
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+{{- if .Values.datasource.enable_datasources }}
+        - mountPath: /tmp/src-datasources
+          name: grafana-datasources
+{{- end }}
+        - mountPath: /tmp/dest-datasources
+          name: grafana-provisioning-datasources
+{{- if .Values.dashboard.enable_dashboards }}
+        - mountPath: /tmp/src-dashboards
+          name: grafana-dashboards
+{{- end }}
+        - mountPath: /tmp/dest-dashboards
+          name: grafana-provisioning-dashboards
+      - env:
+        - name: METHOD
+          value: LIST
+        - name: LABEL
+          value: grafana_datasource
+        - name: FOLDER
+          value: /etc/grafana/provisioning/datasources
+        - name: RESOURCE
+          value: both
+        image: {{ .Values.grafana.sidecar.image }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.grafana.sidecar.name }}-datasources
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-provisioning-datasources
+      - env:
+        - name: METHOD
+          value: LIST
+        - name: LABEL
+          value: grafana_dashboard
+        - name: FOLDER
+          value: /etc/grafana/provisioning/dashboards
+        - name: RESOURCE
+          value: both
+        image: {{ .Values.grafana.sidecar.image }}
+        imagePullPolicy: IfNotPresent
+        name: {{ .Values.grafana.sidecar.name }}-dashboards
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: grafana-provisioning-dashboards
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 472
+        runAsGroup: 472
+        runAsUser: 472
+      serviceAccount: {{ .Values.grafana.name }}
+      serviceAccountName: {{ .Values.grafana.name }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.grafana.name }}-ini
+        name: grafana-ini
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.grafana.name }}-setup
+        name: grafana-setup
+{{- if .Values.datasource.enable_datasources }}
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.grafana.name }}-datasources
+        name: grafana-datasources
+{{- end }}
+      - emptyDir: {}
+        name: grafana-provisioning-datasources
+{{- if .Values.dashboard.enable_dashboards }}
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.grafana.name }}-dashboards
+        name: grafana-dashboards
+{{- end }}
+      - emptyDir: {}
+        name: grafana-provisioning-dashboards
+{{- if .Values.dashboard.custom_dashboard.load_dashboards }}
+      - configMap:
+          defaultMode: 420
+          name: {{ .Values.grafana.name }}-custom-dashboards
+        name: custom-dashboards
+{{- end }}
+{{- if .Values.grafana.data_storage.use_external }}
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.grafana.data_storage.db_name }}
+{{- else }}
+      - name: grafana-data
+        emptyDir: {}
+{{- end }}
+

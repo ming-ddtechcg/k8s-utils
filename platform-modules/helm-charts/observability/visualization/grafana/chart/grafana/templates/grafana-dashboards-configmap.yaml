@@ -1,0 +1,12 @@
+{{- if .Values.dashboard.enable_dashboards }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+    grafana_dashboard: "1"    
+  name: {{ .Values.grafana.name }}-dashboards
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "config/dashboard/providers.yaml").AsConfig | indent 2  }}
+{{- end }}

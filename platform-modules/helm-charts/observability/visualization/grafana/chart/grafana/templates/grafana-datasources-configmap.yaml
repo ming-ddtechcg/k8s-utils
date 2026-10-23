@@ -1,0 +1,12 @@
+{{- if .Values.datasource.enable_datasources }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+    grafana_datasource: "1"
+  name: {{ .Values.grafana.name }}-datasources
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "config/datasource/datasources.yaml").AsConfig | indent 2  }}
+{{- end }}

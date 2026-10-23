@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}-setup
+  namespace: {{ .Release.Namespace }}
+data:
+  setup_grafana.sh: |
+    #!/bin/sh
+
+    mkdir -p /var/lib/grafana/dashboards
+    mkdir -p /var/lib/grafana/db
+
+    if [ -d "/tmp/src-datasources" ] &&
+       [ -d "/tmp/dest-datasources" ]
+    then
+        cp /tmp/src-datasources/* /tmp/dest-datasources
+    fi
+
+    if [ -d "/tmp/src-dashboards" ] &&
+       [ -d "/tmp/dest-dashboards" ]
+    then
+        cp /tmp/src-dashboards/* /tmp/dest-dashboards
+    fi
+

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: service
+    port: {{ .Values.grafana.service.port }}
+    protocol: TCP
+    targetPort: {{ .Values.grafana.ports.grafana_port }}
+  selector:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}  
+  type: {{ .Values.grafana.service.type }}
+

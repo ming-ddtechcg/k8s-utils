@@ -1,0 +1,11 @@
+{{- if .Values.dashboard.load_custom_dashboards }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.grafana.name }}-custom-dashboards
+  labels:
+    app.kubernetes.io/name: {{ .Values.grafana.name }}
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "config/dashboard/dashboards/*.json").AsConfig | indent 2 }}
+{{- end }}
