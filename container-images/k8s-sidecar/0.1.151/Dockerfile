@@ -1,0 +1,2 @@
+FROM kiwigrid/k8s-sidecar:0.1.151
+
