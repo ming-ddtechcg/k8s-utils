@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   labels:
     app.kubernetes.io/name: {{ .Values.grafana.name }}
-    grafana_datasource: "1"
+    #grafana_datasource: "1" # uncomment it while the new data in the runtime
   name: {{ .Values.grafana.name }}-datasources
   namespace: {{ .Release.Namespace }}
 data:
