@@ -4,7 +4,8 @@ metadata:
   name: {{ .Values.tempo.name }}
   annotations:
     prometheus.io/scrape: 'true'
-    prometheus.io/port:   '{{ .Values.tempo.ports.port }}'
+    prometheus.io/port: '{{ index .Values.tempo.ports "metrics" "port" }}'
+    prometheus.io/path: '/metrics'
   labels:
     app.kubernetes.io/name: {{ .Values.tempo.name }}
   namespace: {{ .Release.Namespace }}
@@ -13,6 +14,10 @@ spec:
     app.kubernetes.io/name: {{ .Values.tempo.name }}
   type: ClusterIP  
   ports:
-    - port: {{ .Values.tempo.ports.port }}
-      targetPort: {{ .Values.tempo.ports.port }}
+{{- range $key, $value := .Values.tempo.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
 

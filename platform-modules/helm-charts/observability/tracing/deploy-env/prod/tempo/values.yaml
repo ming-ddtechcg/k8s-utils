@@ -28,8 +28,15 @@ tempo:
       cpu: 100m
       memory: 256Mi
   ports:
-    port_name: metrics
-    port: "3200"
+    grpc:
+      port: "4317"
+      protocol: TCP
+    http:
+      port: "4318"
+      protocol: TCP
+    metrics:
+      port: "3200"
+      protocol: TCP
   config:
     db_storage:
       #

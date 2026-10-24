@@ -67,8 +67,11 @@ spec:
           - -config.file=/etc/tempo/tempo-config.yaml
           - -target=all
         ports:
-        - containerPort: {{ .Values.tempo.ports.port }}
-          name: {{ .Values.tempo.ports.port_name }}
+{{- range $key, $value := .Values.tempo.ports }}
+        - containerPort: {{ $value.port }}
+          name: {{ $key }}
+          protocol: {{ $value.protocol }}
+{{- end }}
         resources:
           limits:
             cpu: {{ .Values.tempo.resources.limits.cpu }}
