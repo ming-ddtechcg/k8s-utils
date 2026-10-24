@@ -6,5 +6,5 @@ metadata:
   name: {{ .Values.grafana.name }}-setup
   namespace: {{ .Release.Namespace }}
 data:
-{{ (.Files.Glob "script/setup_grafana.sh").AsConfig | indent 2  }}
+{{ (.Files.Glob "script/*").AsConfig | indent 2  }}
 

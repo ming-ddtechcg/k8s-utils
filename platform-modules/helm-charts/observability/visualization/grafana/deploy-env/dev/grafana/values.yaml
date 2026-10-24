@@ -19,7 +19,7 @@ service:
 
 grafana:
   name: grafana
-  image: harbor.ddtechcg.com:5001/k8s-utils/grafana:12.3
+  image: harbor.ddtechcg.com:5001/k8s-utils/grafana:13.0
   admin_user: admin
   admin_password: admin
   replicas: 1
@@ -40,10 +40,10 @@ grafana:
       memory: 750Mi
   initworker:
     name: grafana-setup
-    image: harbor.ddtechcg.com:5001/k8s-utils/curl:7.70.0
+    image: harbor.ddtechcg.com:5001/k8s-utils/python:3.12.15
   sidecar:
     name: grafana-sidecar
-    image: harbor.ddtechcg.com:5001/k8s-utils/kiwigrid/k8s-sidecar:0.1.151
+    image: harbor.ddtechcg.com:5001/k8s-utils/k8s-sidecar:0.1.151
   service:
     port: "80"
     type: ClusterIP
@@ -54,15 +54,26 @@ grafana:
     # format:
     # true | false
     #
-    use_external: true
+    use_external: false
     name: grafana-data
     storageclass: nfs-client
     accessmodes: [ "ReadWriteMany" ]
     storage_size: 5Gi
   ingress:
+    #  
+    # to ingress facing, grafana is required to be configured the 
+    # reverse proxy and sub path specify full url (with sub path) in
+    # grafana.ini:
+    # ;root_url = http://<host>/<uri_path>
+    # ;serve_from_sub_path = false # if uri_path is empty
+    # ;serve_from_sub_path = true  # if uri_path is not empty
+    #
+    # format:
+    # true | false
+    #
     enabled: false
     host:
-    uri_path: grafana
+    uri_path:
 
 datasource:
   #
@@ -84,7 +95,7 @@ dashboard:
   # 1. check the custom_dashboard option
   # 2. check providers.yaml and related infor for the custom dashboard loading
   #
-  enable_dashboards: true
+  enable_dashboards: false
   custom_dashboard:
     #
     # to load the dashboards come with this repo.

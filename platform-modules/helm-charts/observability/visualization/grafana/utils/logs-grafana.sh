@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NAMESPACE=""
-CONTAINER_NAME="sra-aim-grafana-dashboard"
+CONTAINER_NAME="grafana"
 
 . ./questionutils.sh ""
 
@@ -14,7 +14,7 @@ CONTAINER_NAME="sra-aim-grafana-dashboard"
 questionAndResponse "enter a namespace"
 NAMESPACE="${ANSWER_REQUESTION_RESPONSE}"
 
-POD_NAMES=`kubectl get pods -n ${NAMESPACE} --no-headers -o wide | grep "^sra-aim-grafana-dashboard-" | awk '{ print $1":"$7 }'`
+POD_NAMES=`kubectl get pods -n ${NAMESPACE} --no-headers -o wide | grep "^grafana-" | awk '{ print $1":"$7 }'`
 
 LIST_POD_NAMES=""
 echo ""

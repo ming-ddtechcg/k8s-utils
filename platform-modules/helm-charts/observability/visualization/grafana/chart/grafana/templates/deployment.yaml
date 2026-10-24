@@ -124,9 +124,8 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /etc/grafana/grafana.ini
-          name: grafana-ini
-          subPath: grafana.ini
+        - mountPath: /etc/grafana/
+          name: grafana-etc-grafana
         - mountPath: /etc/grafana/provisioning/dashboards/
           name: grafana-provisioning-dashboards
         - mountPath: /etc/grafana/provisioning/datasources/
@@ -138,11 +137,18 @@ spec:
         - /bin/sh
         - -c
         - /bin/sh /usr/local/tmp/setup_grafana.sh
+        env:
         - name: EXECUTION
           value: "init"
 {{- if .Values.dashboard.custom_dashboard.load_dashboards }}
         - name: EXTERNAL_DASHBOARD_DIRECTORY_NAME
           value: {{ .Values.dashboard.custom_dashboard.directory_name }}
+{{- end }}
+{{- if .Values.grafana.ingress.enabled }}
+        - name: INGRESS_HOST
+          value: {{ .Values.grafana.ingress.host }}
+        - name: URI_PATH
+          value: {{ .Values.grafana.ingress.uri_path }}
 {{- end }}
         image: {{ .Values.grafana.initworker.image }}
         imagePullPolicy: IfNotPresent
@@ -151,9 +157,8 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /usr/local/tmp/setup_grafana.sh
+        - mountPath: /usr/local/tmp
           name: grafana-setup
-          subPath: setup_grafana.sh
         - mountPath: /var/lib/grafana
           name: grafana-data
 {{- if .Values.datasource.enable_datasources }}
@@ -172,6 +177,10 @@ spec:
         - mountPath: /tmp/src-custom-dashboards
           name: custom-dashboards
 {{- end }}
+        - mountPath: /tmp/src-ini
+          name: grafana-ini
+        - mountPath: /tmp/dest-ini
+          name: grafana-etc-grafana
       - env:
         - name: METHOD
           value: LIST
@@ -223,6 +232,8 @@ spec:
           defaultMode: 420
           name: {{ .Values.grafana.name }}-ini
         name: grafana-ini
+      - emptyDir: {}
+        name: grafana-etc-grafana
       - configMap:
           defaultMode: 420
           name: {{ .Values.grafana.name }}-setup

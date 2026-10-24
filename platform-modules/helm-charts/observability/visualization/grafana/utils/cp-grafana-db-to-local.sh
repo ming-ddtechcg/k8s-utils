@@ -35,7 +35,7 @@ done
 
 questionAndResponse "enter the pod name" "${LIST_POD_NAMES}"
 
-kubectl cp -n ${NAMESPACE} -c ${CONTAINER_NAME} ${ANSWER_REQUESTION_RESPONSE}:/var/lib/grafana/grafana.db ${PWD}/grafana.db
+kubectl cp -n ${NAMESPACE} -c ${CONTAINER_NAME} ${ANSWER_REQUESTION_RESPONSE}:/var/lib/grafana/db/grafana.db ${PWD}/grafana.db
 
 exit 0
 

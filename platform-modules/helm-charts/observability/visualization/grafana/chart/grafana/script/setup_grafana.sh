@@ -52,3 +52,15 @@ then
     fi
 fi
 
+if [ -d "/tmp/src-ini" ] &&
+   [ -d "/tmp/dest-ini" ] &&
+   [ -s "/tmp/src-ini/grafana.ini" ]
+then
+    cp /usr/local/tmp/grafana-ini-server-proc.py /tmp/grafana-ini-server-proc.py
+    chmod +x /tmp/grafana-ini-server-proc.py
+    export GRAFANA_INI="/tmp/src-ini/grafana.ini"
+    /tmp/grafana-ini-server-proc.py > /tmp/dest-ini/grafana.ini
+fi
+
+exit 0
+
