@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NAMESPACE=""
-CONTAINER_NAME="tempo"
+CONTAINER_NAME="otel-collector"
 
 . ./questionutils.sh ""
 
@@ -14,7 +14,7 @@ CONTAINER_NAME="tempo"
 questionAndResponse "enter a namespace"
 NAMESPACE="${ANSWER_REQUESTION_RESPONSE}"
 
-POD_NAMES=`kubectl get pods -n ${NAMESPACE} --no-headers -o wide | grep "^tempo-" | awk '{ print $1":"$7 }'`
+POD_NAMES=`kubectl get pods -n ${NAMESPACE} --no-headers -o wide | grep "^otel-collector-" | awk '{ print $1":"$7 }'`
 
 LIST_POD_NAMES=""
 echo ""
