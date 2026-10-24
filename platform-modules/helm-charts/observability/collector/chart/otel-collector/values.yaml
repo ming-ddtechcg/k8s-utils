@@ -1,0 +1,44 @@
+#
+# otel-collector
+# 
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note:
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+otel_collector:
+  name: otel-collector
+  replicas: "1"
+  image: harbor.ddtechcg.com:5001/k8s-utils/opentelemetry-collector-contrib:0.146.1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  ports:
+    grpc:
+      port: "4317"
+      protocol: TCP
+    http:
+      port: "4318"
+      protocol: TCP
+    self-metrics:
+      port: "8888"
+      protocol: TCP
+    metrics:
+      port: "8889"
+      protocol: TCP
+
