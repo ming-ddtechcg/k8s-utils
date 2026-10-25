@@ -4,7 +4,8 @@ metadata:
   name: {{ .Values.prometheus.name }}
   annotations:
     prometheus.io/scrape: 'true'
-    prometheus.io/port:   '{{ .Values.prometheus.ports.port }}'
+    prometheus.io/port: '{{ index .Values.prometheus.ports "metrics" "port" }}'
+    prometheus.io/path: '/metrics'
   labels:
     app.kubernetes.io/name: {{ .Values.prometheus.name }}
   namespace: {{ .Release.Namespace }}
