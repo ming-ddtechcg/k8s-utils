@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: "1.0"
+description: A Helm chart for nvidia device plugin
+home: https://github.com/ming-ddtechcg/k8s-utils.git
+name: nvidia-device-plugin
+version: 0.0.1
+

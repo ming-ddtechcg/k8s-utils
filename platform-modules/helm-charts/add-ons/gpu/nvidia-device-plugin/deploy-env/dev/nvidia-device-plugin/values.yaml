@@ -1,0 +1,23 @@
+#
+# nvidia device plgin
+#
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note: 
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+nvidia_device_plugin:
+  name: nvidia-device-plugin
+  image: harbor.ddtechcg.com/k8s-utils/nvidia/k8s-device-plugin:v0.17.1
+
