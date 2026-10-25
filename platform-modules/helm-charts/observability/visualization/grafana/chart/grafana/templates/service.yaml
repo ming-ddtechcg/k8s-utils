@@ -18,5 +18,5 @@ spec:
 {{- end }}
   selector:
     app.kubernetes.io/name: {{ .Values.grafana.name }}  
-  type: {{ .Values.grafana.service.type }}
+  type: ClusterIP
 

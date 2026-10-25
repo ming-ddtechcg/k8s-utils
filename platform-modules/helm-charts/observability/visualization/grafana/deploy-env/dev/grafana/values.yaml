@@ -30,9 +30,6 @@ grafana:
     grafana:
       port: "3000"
       protocol: TCP 
-    service:
-      port: "80"
-      protocol: TCP 
   resources:
     limits:
       cpu: 500m
@@ -46,9 +43,6 @@ grafana:
   sidecar:
     name: grafana-sidecar
     image: harbor.ddtechcg.com:5001/k8s-utils/k8s-sidecar:0.1.151
-  service:
-    port: "80"
-    type: ClusterIP
   data_storage:
     #  
     # to use the external storage
