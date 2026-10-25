@@ -13,12 +13,12 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - name: {{ .Values.exporter.ports.http_metrics_port_name }}
-    port: {{ .Values.exporter.ports.http_metrics_port }}
-    targetPort: {{ .Values.exporter.ports.http_metrics_port }}
-  - name: {{ .Values.exporter.ports.telemetry_port_name }}
-    port: {{ .Values.exporter.ports.telemetry_port }}
-    targetPort: {{ .Values.exporter.ports.telemetry_port }}
+{{- range $key, $value := .Values.exporter.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
   selector:
     app.kubernetes.io/name: {{ .Values.exporter.name }}
 

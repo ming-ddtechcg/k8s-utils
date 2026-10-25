@@ -13,6 +13,10 @@ spec:
     app.kubernetes.io/name: {{ .Values.loki.name }}
   type: ClusterIP  
   ports:
-    - port: {{ .Values.loki.ports.port }}
-      targetPort: {{ .Values.loki.ports.port }}
+{{- range $key, $value := .Values.loki.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
 

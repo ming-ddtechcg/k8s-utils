@@ -28,8 +28,9 @@ loki:
       cpu: 100m
       memory: 256Mi
   ports:
-    port_name: metrics
-    port: "3100"
+    metrics:
+      port: "3100"
+      protocol: TCP
   config:
     db_storage:
       #

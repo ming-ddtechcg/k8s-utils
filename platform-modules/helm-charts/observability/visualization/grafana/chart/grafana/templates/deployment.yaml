@@ -91,7 +91,7 @@ spec:
           failureThreshold: 10
           httpGet:
             path: /api/health
-            port: {{ .Values.grafana.ports.grafana_port }}
+            port: {{ .Values.grafana.ports.grafana.port }}
             scheme: HTTP
           initialDelaySeconds: 60
           periodSeconds: 10
@@ -99,17 +99,16 @@ spec:
           timeoutSeconds: 30
         name: {{ .Values.grafana.name }}
         ports:
-        - containerPort: {{ .Values.grafana.ports.service_port }}
-          name: {{ .Values.grafana.ports.service_port_name }}
-          protocol: TCP
-        - containerPort: {{ .Values.grafana.ports.grafana_port }}
-          name: {{ .Values.grafana.ports.grafana_port_name }}
-          protocol: TCP
+{{- range $key, $value := .Values.grafana.ports }}
+        - containerPort: {{ $value.port }}
+          name: {{ $key }}
+          protocol: {{ $value.protocol }}
+{{- end }}
         readinessProbe:
           failureThreshold: 3
           httpGet:
             path: /api/health
-            port: {{ .Values.grafana.ports.grafana_port }}
+            port: {{ .Values.grafana.ports.grafana.port }}
             scheme: HTTP
           periodSeconds: 10
           successThreshold: 1

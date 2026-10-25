@@ -224,6 +224,9 @@ do
 	${UTILS_HOME}/deploy.sh uninstall "${NAMESPACE}" "${CHART_NAME}"
         ;;
     '8')
+        echo ""
+        echo "NOTE: values.yaml with templates will be packaged in."
+
 	questionAndResponse "enter location for saving chart file" 
         LOCATION="${ANSWER_REQUESTION_RESPONSE}"
 

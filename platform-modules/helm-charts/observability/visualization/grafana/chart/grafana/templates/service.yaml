@@ -10,10 +10,12 @@ spec:
   - IPv4
   ipFamilyPolicy: SingleStack
   ports:
-  - name: service
-    port: {{ .Values.grafana.service.port }}
-    protocol: TCP
-    targetPort: {{ .Values.grafana.ports.grafana_port }}
+{{- range $key, $value := .Values.grafana.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
   selector:
     app.kubernetes.io/name: {{ .Values.grafana.name }}  
   type: {{ .Values.grafana.service.type }}

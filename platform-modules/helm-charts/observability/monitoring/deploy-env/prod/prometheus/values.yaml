@@ -28,8 +28,9 @@ prometheus:
       cpu: 100m
       memory: 1500Mi
   ports:
-    port_name: metrics
-    port: "9090"
+    metrics:
+      port: "9090"
+      protocol: TCP
   config:
     db_retention_time: 15d
     db_storage:

@@ -93,8 +93,11 @@ spec:
           - "--web.external-url=/{{ .Values.prometheus.config.web_external_url }}/"
 {{- end }}
         ports:
-        - containerPort: {{ .Values.prometheus.ports.port }}
-          name: {{ .Values.prometheus.ports.port_name }}
+{{- range $key, $value := .Values.prometheus.ports }}
+        - containerPort: {{ $value.port }}
+          name: {{ $key }}
+          protocol: {{ $value.protocol }}
+{{- end }}
         resources:
           limits:
             cpu: {{ .Values.prometheus.resources.limits.cpu }}

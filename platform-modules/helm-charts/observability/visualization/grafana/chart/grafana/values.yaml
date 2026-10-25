@@ -27,10 +27,12 @@ grafana:
     max_surge: 25%
     max_unavailable: 25%
   ports:
-    grafana_port_name: grafana
-    grafana_port: "3000"
-    service_port_name: service
-    service_port: "80"
+    grafana:
+      port: "3000"
+      protocol: TCP 
+    service:
+      port: "80"
+      protocol: TCP 
   resources:
     limits:
       cpu: 500m
@@ -72,7 +74,7 @@ grafana:
     # true | false
     #
     enabled: false
-    host:
+    host: grafana-host
     uri_path:
 
 datasource:

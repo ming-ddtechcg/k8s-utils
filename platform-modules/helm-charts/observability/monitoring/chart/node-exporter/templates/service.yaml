@@ -14,8 +14,10 @@ spec:
   selector:
     app.kubernetes.io/name: {{ .Values.exporter.name }}
   ports:
-  - name: {{ .Values.exporter.port_name }}
-    protocol: TCP
-    port: {{ .Values.exporter.port }}
-    targetPort: {{ .Values.exporter.port }}
+{{- range $key, $value := .Values.exporter.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
 

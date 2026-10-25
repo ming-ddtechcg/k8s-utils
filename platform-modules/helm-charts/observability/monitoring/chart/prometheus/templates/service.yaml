@@ -13,6 +13,10 @@ spec:
     app.kubernetes.io/name: {{ .Values.prometheus.name }}
   type: ClusterIP  
   ports:
-    - port: {{ .Values.prometheus.ports.port }}
-      targetPort: {{ .Values.prometheus.ports.port }}
+{{- range $key, $value := .Values.prometheus.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $value.port }}
+      protocol: {{ $value.protocol }}
+{{- end }}
 

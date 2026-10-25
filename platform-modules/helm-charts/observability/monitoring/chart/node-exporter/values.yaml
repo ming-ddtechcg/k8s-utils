@@ -22,8 +22,10 @@ service:
 exporter:
   name: node-exporter
   image: harbor.ddtechcg.com:5001/k8s-utils/node-exporter:v1.12.1
-  port: "9100"
-  port_name: metrics
+  ports:
+    metrics:
+      port: "9100"
+      protocol: TCP
   resources:
     limits:
       cpu: 250m

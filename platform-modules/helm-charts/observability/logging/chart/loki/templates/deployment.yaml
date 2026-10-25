@@ -67,8 +67,11 @@ spec:
           - -config.file=/etc/loki/loki-config.yaml
           - -target=all
         ports:
-        - containerPort: {{ .Values.loki.ports.port }}
-          name: {{ .Values.loki.ports.port_name }}
+{{- range $key, $value := .Values.loki.ports }}
+        - containerPort: {{ $value.port }}
+          name: {{ $key }}
+          protocol: {{ $value.protocol }}
+{{- end }}
         resources:
           limits:
             cpu: {{ .Values.loki.resources.limits.cpu }}

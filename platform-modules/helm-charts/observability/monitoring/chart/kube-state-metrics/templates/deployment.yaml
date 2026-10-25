@@ -75,14 +75,15 @@ spec:
           timeoutSeconds: 5
         name: {{ .Values.exporter.name }}
         ports:
-        - containerPort: {{ .Values.exporter.ports.http_metrics_port }}
-          name: {{ .Values.exporter.ports.http_metrics_port_name }}
-        - containerPort: {{ .Values.exporter.ports.telemetry_port }}
-          name: {{ .Values.exporter.ports.telemetry_port_name }}
+{{- range $key, $value := .Values.exporter.ports }}
+        - containerPort: {{ $value.port }}
+          name: {{ $key }}
+          protocol: {{ $value.protocol }}
+{{- end }}
         readinessProbe:
           httpGet:
             path: /
-            port: {{ .Values.exporter.ports.telemetry_port }}
+            port: {{ .Values.exporter.ports.telemetry.port }}
           initialDelaySeconds: 5
           timeoutSeconds: 5
         securityContext:

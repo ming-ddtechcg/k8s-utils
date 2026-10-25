@@ -23,10 +23,12 @@ exporter:
   name: kube-state-metrics
   image: harbor.ddtechcg.com:5001/k8s-utils/kube-state-metrics:v2.20.0
   ports:
-    http_metrics_port: "8080"
-    http_metrics_port_name: http-metrics
-    telemetry_port: "8081"
-    telemetry_port_name: telemetry
+    http-metrics:
+      port: "8080"
+      protocol: TCP
+    telemetry:
+      port: "8081"
+      protocol: TCP
   resources:
     limits:
       cpu: 250m
