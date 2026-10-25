@@ -19,10 +19,28 @@ PRG="$0"
 #
 install()
 {
+    CHART_NAME_VAULES_YAML_FILE="${CHART_DIRECTORY}/${CHART_NAME}/values.yaml"
+    CHART_NAME_VAULES_YAML_FILE_TAR="${CHART_DIRECTORY}/${CHART_NAME}/values.yaml.tar"
+
+    if [ -s "${CHART_NAME_VAULES_YAML_FILE}" ]
+    then
+        tar cvf ${CHART_NAME_VAULES_YAML_FILE_TAR} \
+            ${CHART_NAME_VAULES_YAML_FILE} > /dev/null 2>&1
+
+        cp ${VALUES_FILE} ${CHART_DIRECTORY}/${CHART_NAME} > /dev/null 2>&1
+    fi
+
     helm ${HELM_ACTION} ${RELEASE_NAME} \
         --namespace ${NAMESPACE} \
 	${VALUES_OPTION} \
 	${CHART_DIRECTORY}/${CHART_NAME}
+
+    if [ -s "${CHART_NAME_VAULES_YAML_FILE_TAR}" ]
+    then
+        tar xvf ${CHART_NAME_VAULES_YAML_FILE_TAR} \
+          -C .. > /dev/null 2>&1
+        rm -f ${CHART_NAME_VAULES_YAML_FILE_TAR} > /dev/null 2>&1
+    fi
 }
 
 
