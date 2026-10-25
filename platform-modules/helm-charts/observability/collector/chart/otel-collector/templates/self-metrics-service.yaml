@@ -1,0 +1,22 @@
+{{- $selfMetrics := index .Values.otel_collector.ports "self-metrics" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.otel_collector.name }}-self-metrics
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '{{ $selfMetrics.port }}'
+    prometheus.io/path: '/metrics'
+  labels:
+    app.kubernetes.io/name: {{ .Values.otel_collector.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: 
+    app.kubernetes.io/name: {{ .Values.otel_collector.name }}
+  type: ClusterIP  
+  ports:
+    - name: self-metrics
+      port: {{ $selfMetrics.port }}
+      targetPort: {{ $selfMetrics.port }}
+      protocol: {{ $selfMetrics.protocol }}
+
