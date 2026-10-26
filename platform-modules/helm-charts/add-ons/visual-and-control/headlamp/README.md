@@ -7,7 +7,7 @@ $ helm install headlamp headlamp-0.45.0.tgz \
   --namespace kube-system \
   --set image.tag=v0.45.0 \
   --set image.registry=harbor.ddtechcg.com:5001 \
-  --set image.repository=headlamp-k8s/headlamp
+  --set image.repository=k8s-utils/headlamp-k8s/headlamp
 ```
 
 ## token access

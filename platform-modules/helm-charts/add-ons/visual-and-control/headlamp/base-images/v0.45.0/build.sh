@@ -1,4 +1,4 @@
 #!/bin/sh
 
-docker build -f Dockerfile -t harbor.ddtechcg.com:5001/headlamp-k8s/headlamp:v0.45.0 .
+docker build -f Dockerfile -t harbor.ddtechcg.com:5001/k8s-utils/headlamp-k8s/headlamp:v0.45.0 .
 
