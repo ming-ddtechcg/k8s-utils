@@ -20,7 +20,7 @@ service:
 otel_collector:
   name: otel-collector
   replicas: "1"
-  image: harbor.ddtechcg.com:5001/k8s-utils/opentelemetry-collector-contrib:0.146.1
+  image: harbor.ddtechcg.com:5001/k8s-utils/otel/opentelemetry-collector-contrib:0.146.1
   resources:
     limits:
       cpu: 500m
