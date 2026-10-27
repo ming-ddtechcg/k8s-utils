@@ -19,7 +19,7 @@ service:
 
 loki:
   name: loki
-  image: harbor.ddtechcg.com:5001/k8s-utils/loki:3.6.6
+  image: harbor.ddtechcg.com:5001/k8s-utils/grafana/loki:3.6.6
   resources:
     limits:
       cpu: 500m
