@@ -21,7 +21,7 @@ service:
 
 exporter:
   name: kube-state-metrics
-  image: harbor.ddtechcg.com:5001/k8s-utils/kube-state-metrics:v2.20.0
+  image: harbor.ddtechcg.com:5001/k8s-utils/kube-state-metrics/kube-state-metrics:v2.20.0
   ports:
     http-metrics:
       port: "8080"

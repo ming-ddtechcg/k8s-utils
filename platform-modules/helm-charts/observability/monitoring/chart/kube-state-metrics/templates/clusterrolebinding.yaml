@@ -5,7 +5,7 @@ metadata:
     app.kubernetes.io/component: {{ .Values.service.component }}
     app.kubernetes.io/name: {{ .Values.exporter.name }}
     app.kubernetes.io/version: {{ .Values.service.version }}
-  name: kube-state-metrics
+  name: {{ .Values.exporter.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -13,5 +13,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ .Values.exporter.name }}
-  namespace: {{ .Values.service.namespace }}
+  namespace: {{ .Release.Namespace }}
 

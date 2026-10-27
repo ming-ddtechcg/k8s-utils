@@ -21,7 +21,7 @@ service:
 
 exporter:
   name: node-exporter
-  image: harbor.ddtechcg.com:5001/k8s-utils/node-exporter:v1.12.1
+  image: harbor.ddtechcg.com:5001/k8s-utils/prom/node-exporter:v1.12.1
   ports:
     metrics:
       port: "9100"

@@ -70,7 +70,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: {{ .Values.exporter.ports.http_metrics_port }}
+            port: {{ index .Values.exporter.ports "http-metrics" "port" }}
           initialDelaySeconds: 5
           timeoutSeconds: 5
         name: {{ .Values.exporter.name }}
@@ -83,7 +83,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /
-            port: {{ .Values.exporter.ports.telemetry.port }}
+            port: {{ index .Values.exporter.ports "telemetry" "port" }}
           initialDelaySeconds: 5
           timeoutSeconds: 5
         securityContext:
