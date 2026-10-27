@@ -1,7 +1,6 @@
 #
 # RabbitMQ
 #
-
 service:
   nodeAffinity:
     #
@@ -22,7 +21,7 @@ rabbitmq:
   name: rabbitmq
   replicas: "3"
   container:
-    image: harbor.ddtechcg.com/library/rabbitmq:3.13-management
+    image: harbor.ddtechcg.com/k8s-utils/rabbitmq:3.13-management
   ports:
     discovery: "4369"
     amqp: "5672"
@@ -58,7 +57,7 @@ rabbitmq:
 rabbitmq_init:
   name: rabbitmq-init
   container:
-    image: harbor.ddtechcg.com/library/busybox:1.38.0
+    image: harbor.ddtechcg.com/k8s-utils/busybox:1.38.0
   resources:
     limits:
       cpu: 50m
@@ -68,9 +67,9 @@ rabbitmq_mgmt:
   #
   # RabbitMQ management ingress
   #
-  # value: enabled|disable
+  # value: enabled|disabled
   # 
-  ingress: enabled
+  ingress: disabled
   hostname: ariel-rabbitmq-mgmt.ddtechcg.com
   #
   # set URI
