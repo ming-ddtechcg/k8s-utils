@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.metrics_scraper.name }}
+  name: {{ .Values.metrics_scraper.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{ .Values.metrics_scraper.ports.port }}
+      targetPort: {{ .Values.metrics_scraper.ports.port }}
+  selector:
+    app.kubernetes.io/name: {{ .Values.metrics_scraper.name }}
+

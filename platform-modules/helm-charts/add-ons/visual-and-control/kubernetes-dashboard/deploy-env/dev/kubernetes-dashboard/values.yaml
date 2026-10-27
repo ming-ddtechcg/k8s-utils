@@ -1,0 +1,45 @@
+#
+# Kubernetes dashboard
+#
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note: 
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+dashboard:
+  name: kubernetes-dashboard
+  image: harbor.ddtechcg.com/k8s-utils/kubernetesui/dashboard:v2.0.0
+  ports:
+    port: "8443"
+    protocol: TCP
+  service:
+    ports:
+      port: "443"
+      protocol: TCP
+  config:
+    #
+    # enable the kubernetes dashboard as the cluster admin
+    #
+    # format:
+    # true | false
+    #
+    cluster_admin: false
+
+metrics_scraper:
+  name: dashboard-metrics-scraper
+  image: harbor.ddtechcg.com/k8s-utils/kubernetesui/metrics-scraper:v1.0.4 
+  ports:
+    port: "8000"
+    protocol: TCP
+

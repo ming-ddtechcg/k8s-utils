@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.dashboard.name }}
+  name: {{ .Values.dashboard.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{ .Values.dashboard.service.ports.port }}
+      targetPort: {{ .Values.dashboard.ports.port }}
+      protocol: {{ .Values.dashboard.service.ports.protocol }}
+  selector:
+    app.kubernetes.io/name: {{ .Values.dashboard.name }}
+

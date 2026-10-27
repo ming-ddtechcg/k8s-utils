@@ -1,0 +1,49 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.metrics_scraper.name }}
+  name: {{ .Values.metrics_scraper.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.metrics_scraper.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.metrics_scraper.name }}
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ .Values.metrics_scraper.name }}
+          image: {{ .Values.metrics_scraper.image }}
+          ports:
+            - containerPort: {{ .Values.metrics_scraper.ports.port }}
+              protocol: {{ .Values.metrics_scraper.ports.protocol }}
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: {{ .Values.metrics_scraper.ports.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp-volume
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 1001
+            runAsGroup: 2001
+      serviceAccountName: {{ .Values.dashboard.name }}
+      nodeSelector:
+        "kubernetes.io/os": linux
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+
