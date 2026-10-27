@@ -19,7 +19,7 @@ service:
 
 grafana:
   name: grafana
-  image: harbor.ddtechcg.com:5001/k8s-utils/grafana:13.0
+  image: harbor.ddtechcg.com:5001/k8s-utils/grafana/grafana:13.0
   admin_user: admin
   admin_password: admin
   replicas: 1
@@ -42,7 +42,7 @@ grafana:
     image: harbor.ddtechcg.com:5001/k8s-utils/python:3.12.15
   sidecar:
     name: grafana-sidecar
-    image: harbor.ddtechcg.com:5001/k8s-utils/k8s-sidecar:0.1.151
+    image: harbor.ddtechcg.com:5001/k8s-utils/kiwigrid/k8s-sidecar:0.1.151
   data_storage:
     #  
     # to use the external storage
