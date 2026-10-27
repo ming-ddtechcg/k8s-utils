@@ -1,0 +1,57 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.headlamp.name }}
+  name: {{ .Values.headlamp.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.headlamp.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.headlamp.name }}
+    spec:
+      containers:
+        - name: {{ .Values.headlamp.name }}
+          image: {{ .Values.headlamp.image }}
+          args:
+            - "-in-cluster"
+            - "-plugins-dir=/headlamp/plugins"
+          env:
+            - name: HEADLAMP_CONFIG_TRACING_ENABLED
+              value: "true"
+            - name: HEADLAMP_CONFIG_METRICS_ENABLED
+              value: "true"
+            - name: HEADLAMP_CONFIG_OTLP_ENDPOINT
+              value: "{{ .Values.headlamp.config.otel_collector_url }}"
+            - name: HEADLAMP_CONFIG_SERVICE_NAME
+              value: "headlamp"
+            - name: HEADLAMP_CONFIG_SERVICE_VERSION
+              value: "latest"
+          ports:
+{{- range $key, $value := .Values.headlamp.ports }}
+            - containerPort: {{ $value.port }}
+              name: {{ $key }}
+              protocol: {{ $value.protocol }}
+{{- end }}
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: {{ .Values.headlamp.ports.http.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: {{ .Values.headlamp.ports.http.port }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 30
+      nodeSelector:
+        'kubernetes.io/os': linux
+

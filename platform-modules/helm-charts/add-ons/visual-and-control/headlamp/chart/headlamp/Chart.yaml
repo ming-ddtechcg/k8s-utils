@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: "1.0"
+description: A Helm chart for Kubernetes UI
+home: https://github.com/ming-ddtechcg/k8s-utils.git
+name: headlamp
+version: 0.0.1
+

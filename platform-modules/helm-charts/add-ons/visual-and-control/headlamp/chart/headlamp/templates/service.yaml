@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ .Values.headlamp.name }}
+  name: {{ .Values.headlamp.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{ .Values.headlamp.service.ports.port }}
+      targetPort: {{ .Values.headlamp.ports.http.port }}
+      protocol: {{ .Values.headlamp.service.ports.protocol }}
+  selector:
+    app.kubernetes.io/name: {{ .Values.headlamp.name }}
+

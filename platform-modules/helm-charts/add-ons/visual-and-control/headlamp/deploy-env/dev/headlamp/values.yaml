@@ -1,0 +1,49 @@
+#
+# headlamp
+#
+service:
+  nodeAffinity:
+    #
+    # node label
+    # Note: 
+    # 1. if key is set, the service runs within node(s) is/are labeled with value "enabled"
+    # 2. if key is not set (empty), the service runs within all nodes except control-plane/master node(s)
+    #
+    key:
+    #
+    # options for the node affinity
+    # format:
+    # enabled | disabled
+    #
+    value: enabled
+
+headlamp:
+  name: headlamp
+  image: harbor.ddtechcg.com/k8s-utils/headlamp-k8s/headlamp:v0.45.0
+  ports:
+    http:
+      port: "4466"
+      protocol: TCP
+    metrics:
+      port: "9090"
+      protocol: TCP
+  service:
+    ports:
+      port: "80"
+      protocol: TCP
+  config:
+    #
+    # enable the headlamp as the cluster admin
+    #
+    # format:
+    # true | false
+    #
+    cluster_admin: true
+    #
+    # OpenTelemetry collector URL
+    #
+    # for example:
+    #   otel_collector_url: otel-collector:4317
+    #
+    otel_collector_url: otel-collector.opentelemetry.svc:4317
+
