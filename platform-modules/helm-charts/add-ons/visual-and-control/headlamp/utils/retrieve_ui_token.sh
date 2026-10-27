@@ -15,10 +15,8 @@ NAMESPACE="${ANSWER_REQUESTION_RESPONSE}"
 questionAndResponse "Enter the name of the deployment"
 DEPLOYMENT_NAME="${ANSWER_REQUESTION_RESPONSE}"
 
-set -x
 SECRET_NAME=`kubectl get secrets -n kube-system -o json \
     | jq -r '.items[] | select( .metadata.labels and .metadata.labels."app.kubernetes.io/name" != null and .metadata.labels."app.kubernetes.io/name" == "'"${DEPLOYMENT_NAME}"'" ) | .metadata.name'`
-set +x
 
 if [ "${SECRET_NAME}" != "" ]
 then
