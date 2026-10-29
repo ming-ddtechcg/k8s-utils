@@ -59,12 +59,9 @@ def renderServerSection(host: str, uri_path: str) -> None:
 
     if len(uri_path) > 0:
         new_grafana_ini_server_section.append("serve_from_sub_path = true")
-    else:
-        new_grafana_ini_server_section.append("serve_from_sub_path = false")
-
-    if len(uri_path) > 0:
         new_grafana_ini_server_section.append("root_url = http://"+host+"/"+uri_path)
     else:
+        new_grafana_ini_server_section.append("serve_from_sub_path = false")
         new_grafana_ini_server_section.append("root_url = http://"+host)
 
     if new_grafana_ini_server_section:
