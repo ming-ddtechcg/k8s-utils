@@ -34,4 +34,5 @@ Examples:
   echo "2Gi" | ./k8s-resource-converter --resource-type=memory
 ```
 
+This tool is useful to be used with the script to convert the resource to the comparable or calcuatable numeric number.
 
