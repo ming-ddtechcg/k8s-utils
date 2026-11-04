@@ -36,3 +36,22 @@ Examples:
 
 This tool is useful to be used with the script to convert the resource to the comparable or calcuatable numeric number.
 
+Results based on the help examples:
+
+```console
+$ echo "100m" | ./k8s-resource-converter --resource-type=cpu
+100
+
+$ echo "100m" | ./k8s-resource-converter --resource-type=cpu
+100
+
+$ echo "2" | ./k8s-resource-converter --resource-type=cpu
+2000
+
+$ echo "0.2Gi" | ./k8s-resource-converter --resource-type=memory
+214748365
+
+$ echo "2Gi" | ./k8s-resource-converter --resource-type=memory
+2147483648
+```
+
